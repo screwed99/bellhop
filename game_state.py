@@ -190,6 +190,9 @@ class Passenger:
     def __str__(self):
         return "Pass[id: {} start:{} dest:{} in:{} drop: {}]".format(self._id, self._floor_entered, self._desired_floor, self._in_elevator, self._dropped_off)
 
+    def get_desired_floor(self):
+        return self._desired_floor
+
     def pick_up(self):
         assert(not self._in_elevator and not self._dropped_off)
         self._in_elevator = True
