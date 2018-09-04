@@ -114,6 +114,9 @@ class Bellhop:
         if self._curr_state == self._next_state:
             self._next_state = next_state
             self._state_leave = time.time() + timeout
+            
+    def _goto_next_state(self):
+        self._curr_state = self._next_state
 
     def on_input(self, s_input):
         self._user_input = s_input
@@ -144,9 +147,6 @@ class Bellhop:
 
     def _state_timeout(self):
         return self._curr_state != self._next_state and self._state_leave > time.time()
-
-    def _goto_next_state(self):
-        self._curr_state = self._next_state
 
 
 class Passenger:
