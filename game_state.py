@@ -92,4 +92,7 @@ class Passenger:
         self._in_elevator = False
         self._dropped_off = False
 
+    def get_desired_floor(self):
+        return self._desired_floor
+
 
