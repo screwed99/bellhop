@@ -57,10 +57,12 @@ class Bellhop:
         self._capacity = capacity
 
     def __str__(self):
-        ret = "{} ON {}| " \
-               "People in {} \n" \
-               "".format(game.get_state(), game._curr_floor,
-                         len(game.get_elevator_contents()))
+        ret = "{} ON {} | ".format(game.get_state(), game._curr_floor)
+        ret += "\n|----- Elevator -----|\n"
+        people_in = game.get_elevator_contents()
+        for x in people_in:
+            ret += "| {} |\n".format(x)
+        ret += "|____________________|\n"
         people_waiting = game.get_people_waiting()
         for x in people_waiting:
             ret += "{}\n".format(x)
@@ -127,9 +129,11 @@ class Bellhop:
 
     def make_random_passenger(self):
         if random.random() < PASSENGER_PCT_CHANCE_PER_TICK:
-            p = Passenger(random.randint(0, self._num_floors - 1),
-                          random.randint(0, self._num_floors - 1)
-                         )
+            start_floor = random.randint(0, self._num_floors - 1)
+            end_floor = start_floor
+            while end_floor == start_floor:
+                end_floor = random.randint(0, self._num_floors - 1)
+            p = Passenger(start_floor, end_floor)
             self._passengers.add_passenger(p)
 
     def _change_floor(self):
@@ -158,7 +162,7 @@ class Passenger:
         Passenger.id_num += 1
 
     def __str__(self):
-        return "Pass[start:{} dest:{} in:{} drop: {}]".format(self._floor_entered, self._desired_floor, self._in_elevator, self._dropped_off)
+        return "Pass[id: {} start:{} dest:{} in:{} drop: {}]".format(self._id, self._floor_entered, self._desired_floor, self._in_elevator, self._dropped_off)
 
     def pick_up(self):
         assert(not self._in_elevator and not self._dropped_off)
@@ -200,7 +204,6 @@ class GaggleOfPassengers:
     def get_people_waiting_by_floor(self):
         waiting = {key: [] for key in range(0, self._num_floors)}
         for passenger in self._passengers:
-            print(passenger)
             if passenger.is_waiting_for_pickup():
                 waiting[passenger._floor_entered].append(passenger)
         return waiting
@@ -212,7 +215,7 @@ class GaggleOfPassengers:
 
     def drop_off(self, floor):
         for passenger in self._passengers:
-            if passenger.is_in_elevator():
+            if passenger.is_in_elevator() and passenger._desired_floor == floor:
                 passenger.drop_off()
 
 
@@ -226,11 +229,9 @@ if __name__ == '__main__':
         if text.lower() == 'u' or text.lower == 'up':
             game.on_input(UserInput(Direction.UP))
             game.step()
-            print("up", game._curr_floor)
         elif text.lower() == 'd' or text.lower == 'down':
             game.on_input(UserInput(Direction.DOWN))
             game.step()
-            print("down", game._curr_floor)
         elif text.lower() == 'q':
             exit(1)
         else:
