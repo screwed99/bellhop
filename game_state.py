@@ -19,7 +19,7 @@ STATE_TIME_PEOPLE_OFF_SECONDS = 0.5
 STATE_TIME_PEOPLE_ON_SECONDS = 0.5
 STATE_TIME_MOVING_SECONDS = 2
 
-PASSENGER_PCT_CHANCE_PER_TICK = 0.4
+PASSENGER_PCT_CHANCE_PER_TICK = 0.1
 
 # todo MAX how does user input look?
 # todo MAX is this sanitized?
@@ -69,8 +69,12 @@ class Bellhop:
             for y in people_waiting[x]:
                 ret += "{} ".format(y)
             ret += "\n"
-        ret += "Enter (u)p/(d)own"
         return ret
+
+    def run(self):
+        while 1:
+            self.step()
+            time.sleep(0.1)
 
     def step(self):
         self.make_random_passenger()
@@ -94,6 +98,9 @@ class Bellhop:
 
         elif self._curr_state == State.WAIT_INPUT:
             self._setup_next_state(State.WAIT_INPUT, State.MOVING, STATE_TIME_PEOPLE_ON_SECONDS)
+            self.make_random_passenger(force=True)
+            print(self)
+            self._collect_input()
             if self._user_input != None:
                 # print("detected input {}".format(self._user_input))
                 self._direction = self._user_input.get_direction()
@@ -111,12 +118,24 @@ class Bellhop:
     def _setup_next_state(self, in_state, next_state, timeout=0.):
         if in_state == self._next_state:
             self._curr_state = in_state
+            print(self)
         if self._curr_state == self._next_state:
             self._next_state = next_state
             self._state_leave = time.time() + timeout
-            
+
     def _goto_next_state(self):
         self._curr_state = self._next_state
+
+    # todo MAX make obsolete
+    def _collect_input(self):
+        text = input("Enter (u)p/(d)own:")
+
+        if text.lower() == 'u' or text.lower == 'up':
+            game.on_input(UserInput(Direction.UP))
+        elif text.lower() == 'd' or text.lower == 'down':
+            game.on_input(UserInput(Direction.DOWN))
+        elif text.lower() == 'q':
+            exit(1)
 
     def on_input(self, s_input):
         self._user_input = s_input
@@ -130,8 +149,8 @@ class Bellhop:
     def get_people_waiting(self):
         return self._passengers.get_people_waiting_by_floor()
 
-    def make_random_passenger(self):
-        if random.random() < PASSENGER_PCT_CHANCE_PER_TICK:
+    def make_random_passenger(self, force=False):
+        if force or random.random() < PASSENGER_PCT_CHANCE_PER_TICK:
             start_floor = random.randint(0, self._num_floors - 1)
             end_floor = start_floor
             while end_floor == start_floor:
@@ -146,7 +165,9 @@ class Bellhop:
             self._curr_floor -= 1
 
     def _state_timeout(self):
-        return self._curr_state != self._next_state and self._state_leave > time.time()
+        leave_on_time = self._state_leave > time.time()
+        if leave_on_time: print("blocked by time")
+        return self._curr_state != self._next_state and leave_on_time
 
 
 class Passenger:
@@ -221,19 +242,4 @@ class GaggleOfPassengers:
 
 if __name__ == '__main__':
     game = Bellhop(3, 10)
-    while 1:
-        print(game)
-        text = ''
-        text = input() # todo faster game tick?
-
-        if text.lower() == 'u' or text.lower == 'up':
-            game.on_input(UserInput(Direction.UP))
-            game.step()
-        elif text.lower() == 'd' or text.lower == 'down':
-            game.on_input(UserInput(Direction.DOWN))
-            game.step()
-        elif text.lower() == 'q':
-            exit(1)
-        else:
-            game.step()
-
+    game.run()
