@@ -54,16 +54,17 @@ class Bellhop:
 
         # people
         self._passengers = GaggleOfPassengers(self._num_floors)
+        # todo enforce capacity
         self._capacity = capacity
 
     def __str__(self):
-        ret = "{} ON {} | ".format(game.get_state(), game._curr_floor)
+        ret = "{} ON {} | ".format(self.get_state(), self._curr_floor)
         ret += "\n|----- Elevator -----|\n"
-        people_in = game.get_elevator_contents()
+        people_in = self.get_elevator_contents()
         for x in people_in:
             ret += "| {} |\n".format(x)
         ret += "|____________________|\n"
-        people_waiting = game.get_people_waiting()
+        people_waiting = self.get_people_waiting()
         for x in people_waiting:
             ret += "{}\n".format(x)
             for y in people_waiting[x]:
@@ -97,16 +98,16 @@ class Bellhop:
                 self._goto_next_state()
 
         elif self._curr_state == State.WAIT_INPUT:
-            self._setup_next_state(State.WAIT_INPUT, State.MOVING, STATE_TIME_PEOPLE_ON_SECONDS)
-            self.make_random_passenger(force=True)
-            print(self)
+            changed = self._setup_next_state(State.WAIT_INPUT, State.MOVING, STATE_TIME_PEOPLE_ON_SECONDS)
+            if changed:
+                self.make_random_passenger(force=True)
+                print(self) # todo remove this startup hack
             self._collect_input()
             if self._user_input != None:
-                # print("detected input {}".format(self._user_input))
                 self._direction = self._user_input.get_direction()
                 self._user_input = None
-                self._change_floor()
-                self._goto_next_state()
+                if self._change_floor():
+                    self._goto_next_state()
 
         elif self._curr_state == State.MOVING:
             self._setup_next_state(State.MOVING, State.ARRIVING, STATE_TIME_MOVING_SECONDS)
@@ -116,26 +117,29 @@ class Bellhop:
             raise NotImplementedError
 
     def _setup_next_state(self, in_state, next_state, timeout=0.):
-        if in_state == self._next_state:
-            self._curr_state = in_state
-            print(self)
         if self._curr_state == self._next_state:
             self._next_state = next_state
             self._state_leave = time.time() + timeout
+            return True
+        return False
 
     def _goto_next_state(self):
+        print(self)
         self._curr_state = self._next_state
 
     # todo MAX make obsolete
     def _collect_input(self):
-        text = input("Enter (u)p/(d)own:")
-
-        if text.lower() == 'u' or text.lower == 'up':
-            game.on_input(UserInput(Direction.UP))
-        elif text.lower() == 'd' or text.lower == 'down':
-            game.on_input(UserInput(Direction.DOWN))
-        elif text.lower() == 'q':
-            exit(1)
+        input_valid = False
+        while not input_valid:
+            text = input("Enter (u)p/(d)own:")
+            if text.lower() == 'u' or text.lower == 'up':
+                self.on_input(UserInput(Direction.UP))
+                input_valid = True
+            elif text.lower() == 'd' or text.lower == 'down':
+                self.on_input(UserInput(Direction.DOWN))
+                input_valid = True
+            elif text.lower() == 'q':
+                exit(1)
 
     def on_input(self, s_input):
         self._user_input = s_input
@@ -161,13 +165,14 @@ class Bellhop:
     def _change_floor(self):
         if self._direction == Direction.UP and self._curr_floor < self._num_floors:
             self._curr_floor += 1
+            return True
         elif self._direction == Direction.DOWN and self._curr_floor > 0:
             self._curr_floor -= 1
+            return True
+        return False
 
     def _state_timeout(self):
-        leave_on_time = self._state_leave > time.time()
-        if leave_on_time: print("blocked by time")
-        return self._curr_state != self._next_state and leave_on_time
+        return self._curr_state != self._next_state and self._state_leave > time.time()
 
 
 class Passenger:
@@ -244,5 +249,5 @@ class GaggleOfPassengers:
 
 
 if __name__ == '__main__':
-    game = Bellhop(3, 10)
+    game = Bellhop(4, 10)
     game.run()
