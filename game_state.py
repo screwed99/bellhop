@@ -53,7 +53,7 @@ class Bellhop:
         self._elevator_moving = False
 
         # people
-        self._passengers = GaggleOfPassengers(self._num_floors)
+        self._passengers = GaggleOfPassengers()
         # todo enforce capacity
         self._capacity = capacity
 
@@ -98,7 +98,9 @@ class Bellhop:
                 self._goto_next_state()
 
         elif self._curr_state == State.WAIT_INPUT:
-            changed = self._setup_next_state(State.WAIT_INPUT, State.MOVING, STATE_TIME_PEOPLE_ON_SECONDS)
+            changed = self._setup_next_state(State.WAIT_INPUT,
+                                             State.MOVING,
+                                             STATE_TIME_PEOPLE_ON_SECONDS)
             if changed:
                 self.make_random_passenger(force=True)
                 print(self) # todo remove this startup hack
@@ -132,10 +134,10 @@ class Bellhop:
         input_valid = False
         while not input_valid:
             text = input("Enter (u)p/(d)own:")
-            if text.lower() == 'u' or text.lower == 'up':
+            if text.lower() in ('u', 'up', 'w'):
                 self.on_input(UserInput(Direction.UP))
                 input_valid = True
-            elif text.lower() == 'd' or text.lower == 'down':
+            elif text.lower() in ('d', 'down', 's'):
                 self.on_input(UserInput(Direction.DOWN))
                 input_valid = True
             elif text.lower() == 'q':
@@ -151,7 +153,7 @@ class Bellhop:
         return self._passengers.get_passengers_in_elevator()
 
     def get_people_waiting(self):
-        return self._passengers.get_people_waiting_by_floor()
+        return self._passengers.get_passengers_waiting_by_floor()
 
     def make_random_passenger(self, force=False):
         if force or random.random() < PASSENGER_PCT_CHANCE_PER_TICK:
@@ -185,10 +187,15 @@ class Passenger:
         self._in_elevator = False
         self._dropped_off = False
         self._id = Passenger.id_num
-        Passenger.id_num += 1
+        Passenger.id_num += 1  # is this legit?
 
     def __str__(self):
-        return "Pass[id: {} start:{} dest:{} in:{} drop: {}]".format(self._id, self._floor_entered, self._desired_floor, self._in_elevator, self._dropped_off)
+        return "Pass[id: {} start:{} dest:{} in:{} drop: {}]"\
+            .format(self._id,
+                    self._floor_entered,
+                    self._desired_floor,
+                    self._in_elevator,
+                    self._dropped_off)
 
     def get_desired_floor(self):
         return self._desired_floor
@@ -215,36 +222,34 @@ class Passenger:
 
 
 class GaggleOfPassengers:
-    def __init__(self, num_floors):
+    def __init__(self):
         self._passengers = []
-        # todo THIJS remove need for this value
-        self._num_floors = num_floors
 
     def add_passenger(self, passenger):
         self._passengers.append(passenger)
 
     def get_passengers_in_elevator(self):
-        in_elevator = []
-        for passenger in self._passengers:
-            if passenger._in_elevator:
-                in_elevator.append(passenger)
-        return in_elevator
+        return [passenger for passenger in self._passengers if passenger._in_elevator]
 
-    def get_people_waiting_by_floor(self):
-        waiting = {key: [] for key in range(0, self._num_floors)}
-        for passenger in self._passengers:
-            if passenger.is_waiting_for_pickup():
-                waiting[passenger._floor_entered].append(passenger)
-        return waiting
+    def get_passengers_waiting(self):
+        return [passenger for passenger in self._passengers if passenger.is_waiting_for_pickup()]
+
+    def get_passengers_waiting_by_floor(self):
+        waiting_by_floor = {}
+        for passenger in self.get_passengers_waiting():
+            floor = passenger._floor_entered
+            if floor not in waiting_by_floor:
+                waiting_by_floor[floor] = []
+            waiting_by_floor[floor].append(passenger)
+        return waiting_by_floor
 
     def pick_up(self, floor):
-        for passenger in self._passengers:
-            if passenger.is_waiting_for_pickup() and passenger._floor_entered == floor:
-                passenger.pick_up()
+        for passenger in self.get_passengers_waiting_by_floor().get(floor, []):
+            passenger.pick_up()
 
     def drop_off(self, floor):
-        for passenger in self._passengers:
-            if passenger.is_in_elevator() and passenger._desired_floor == floor:
+        for passenger in self.get_passengers_in_elevator():
+            if passenger._desired_floor == floor:
                 passenger.drop_off()
 
 
