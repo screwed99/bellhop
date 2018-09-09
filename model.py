@@ -1,18 +1,7 @@
-from enum import Enum
 import time
 import random
+from enums import State, Direction
 random.seed(time.time())
-
-class Direction(Enum):
-    UP = 0
-    DOWN = 1
-
-class State(Enum):
-    ARRIVING = 0
-    PEOPLE_OFF = 1
-    PEOPLE_ON = 2
-    WAIT_INPUT = 3
-    MOVING = 4
 
 STATE_TIME_ARRIVAL_SECONDS = 0.5
 STATE_TIME_PEOPLE_OFF_SECONDS = 0.5
@@ -20,18 +9,6 @@ STATE_TIME_PEOPLE_ON_SECONDS = 0.5
 STATE_TIME_MOVING_SECONDS = 2
 
 PASSENGER_PCT_CHANCE_PER_TICK = 0.1
-
-# todo MAX how does user input look?
-# todo MAX is this sanitized?
-class UserInput:
-    def __init__(self, direction):
-        self._direction = direction
-
-    def get_direction(self):
-        return self._direction
-
-    def __str__(self):
-        return "UP" if self._direction == Direction.UP else "DOWN"
 
 
 class Bellhop:
@@ -72,12 +49,10 @@ class Bellhop:
             ret += "\n"
         return ret
 
-    def run(self):
-        while 1:
-            self.step()
-            time.sleep(0.1)
 
-    def step(self):
+    def step(self, user_input):
+        self._user_input = user_input
+
         self.make_random_passenger()
         if self._curr_state == State.ARRIVING:
             self._setup_next_state(State.ARRIVING, State.PEOPLE_OFF, STATE_TIME_ARRIVAL_SECONDS)
@@ -104,8 +79,8 @@ class Bellhop:
             if changed:
                 self.make_random_passenger(force=True)
                 print(self) # todo remove this startup hack
-            self._collect_input()
-            if self._user_input != None:
+
+            if self._user_input is not None:
                 self._direction = self._user_input.get_direction()
                 self._user_input = None
                 if self._change_floor():
@@ -128,23 +103,6 @@ class Bellhop:
     def _goto_next_state(self):
         print(self)
         self._curr_state = self._next_state
-
-    # todo MAX make obsolete
-    def _collect_input(self):
-        input_valid = False
-        while not input_valid:
-            text = input("Enter (u)p/(d)own:")
-            if text.lower() in ('u', 'up', 'w'):
-                self.on_input(UserInput(Direction.UP))
-                input_valid = True
-            elif text.lower() in ('d', 'down', 's'):
-                self.on_input(UserInput(Direction.DOWN))
-                input_valid = True
-            elif text.lower() == 'q':
-                exit(1)
-
-    def on_input(self, s_input):
-        self._user_input = s_input
 
     def get_state(self):
         return self._curr_state
@@ -175,6 +133,7 @@ class Bellhop:
 
     def _state_timeout(self):
         return self._curr_state != self._next_state and self._state_leave > time.time()
+
 
 
 class Passenger:
@@ -221,6 +180,7 @@ class Passenger:
         return self._dropped_off
 
 
+
 class GaggleOfPassengers:
     def __init__(self):
         self._passengers = []
@@ -251,8 +211,3 @@ class GaggleOfPassengers:
         for passenger in self.get_passengers_in_elevator():
             if passenger._desired_floor == floor:
                 passenger.drop_off()
-
-
-if __name__ == '__main__':
-    game = Bellhop(4, 10)
-    game.run()
