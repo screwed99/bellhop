@@ -1,6 +1,7 @@
 import time
 
 from model import Bellhop
+from view import BellhopViewer, DebugView
 from enums import State, Direction
 
 # todo MAX how does user input look?
@@ -24,9 +25,8 @@ class GameController(object):
 
     def __init__(self, num_floors, capacity):
         self._game = Bellhop(num_floors, capacity)
-
-    def _on_input(self, s_input):
-        self._user_input = s_input
+        self._viewer = BellhopViewer(self._game)
+        self._view = DebugView(self._viewer)
 
     # todo MAX make obsolete
     def _collect_input(self):
@@ -34,25 +34,32 @@ class GameController(object):
         while not input_valid:
             text = input("Enter (u)p/(d)own:")
             if text.lower() in ('u', 'up', 'w'):
-                self._on_input(UserInput(Direction.UP))
+                user_input = UserInput(Direction.UP)
                 input_valid = True
             elif text.lower() in ('d', 'down', 's'):
-                self._on_input(UserInput(Direction.DOWN))
+                user_input = UserInput(Direction.DOWN)
                 input_valid = True
             elif text.lower() == 'q':
                 exit(1) #filthy low level gutter dwelling scum code
-
+        return user_input
 
     def run(self):
         while True:
+            #Model stuff
             curr_state = self._game.get_state()
             if curr_state == State.WAIT_INPUT:
-                self._collect_input()
-                user_input = self._user_input #TODO this is gross
+                user_input = self._collect_input()
+                self._game.step(user_input)
             else:
-                user_input = None #TODO yuck
-            self._game.step(user_input)
+                self._game.step(None)
+
+            #Viewer stuff
+            self._viewer.update_model(self._game)
+            self._view.run()
+
+            #Control
             time.sleep(0.1)
+
 
 
 if __name__ == '__main__':

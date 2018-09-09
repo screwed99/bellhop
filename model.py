@@ -1,5 +1,6 @@
 import time
 import random
+import abc
 from enums import State, Direction
 random.seed(time.time())
 
@@ -7,11 +8,34 @@ STATE_TIME_ARRIVAL_SECONDS = 0.5
 STATE_TIME_PEOPLE_OFF_SECONDS = 0.5
 STATE_TIME_PEOPLE_ON_SECONDS = 0.5
 STATE_TIME_MOVING_SECONDS = 2
-
 PASSENGER_PCT_CHANCE_PER_TICK = 0.1
 
 
-class Bellhop:
+class BellhopViewInterface(abc.ABC):
+
+    @abc.abstractmethod
+    def get_state(self):
+        pass
+
+    @abc.abstractmethod
+    def get_elevator_contents(self):
+        pass
+
+    @abc.abstractmethod
+    def get_people_waiting(self):
+        pass
+
+    @abc.abstractmethod
+    def get_current_floor(self):
+        pass
+
+
+class Bellhop(BellhopViewInterface):
+    REQUIRED_SNAPSHOT_KEYS = ("curr_state",
+                              "next_state",
+                              "passengers",
+                              )
+
     def __init__(self, num_floors, capacity):
         self._curr_state = State.WAIT_INPUT
         self._next_state = State.WAIT_INPUT
@@ -22,32 +46,11 @@ class Bellhop:
         self._num_floors = num_floors
         self._curr_floor = 0
 
-        # controls
-        # todo THIJS link this with new passenger gen
-        self._indicators_lit = {key: False for key in range(0, self._num_floors)}
-
-        # door
-        self._elevator_moving = False
 
         # people
         self._passengers = GaggleOfPassengers()
         # todo enforce capacity
         self._capacity = capacity
-
-    def __str__(self):
-        ret = "{} ON {} | ".format(self.get_state(), self._curr_floor)
-        ret += "\n|----- Elevator -----|\n"
-        people_in = self.get_elevator_contents()
-        for x in people_in:
-            ret += "| {} |\n".format(x)
-        ret += "|____________________|\n"
-        people_waiting = self.get_people_waiting()
-        for x in people_waiting:
-            ret += "{}\n".format(x)
-            for y in people_waiting[x]:
-                ret += "{} ".format(y)
-            ret += "\n"
-        return ret
 
 
     def step(self, user_input):
@@ -62,13 +65,13 @@ class Bellhop:
 
         elif self._curr_state == State.PEOPLE_OFF:
             self._setup_next_state(State.PEOPLE_OFF, State.PEOPLE_ON, STATE_TIME_PEOPLE_OFF_SECONDS)
-            self._passengers.drop_off(self._curr_floor)
+            self._passengers.drop_off(self.get_current_floor())
             if self._state_timeout():
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_ON:
             self._setup_next_state(State.PEOPLE_ON, State.WAIT_INPUT, STATE_TIME_PEOPLE_ON_SECONDS)
-            self._passengers.pick_up(self._curr_floor)
+            self._passengers.pick_up(self.get_current_floor())
             if self._state_timeout():
                 self._goto_next_state()
 
@@ -78,7 +81,7 @@ class Bellhop:
                                              STATE_TIME_PEOPLE_ON_SECONDS)
             if changed:
                 self.make_random_passenger(force=True)
-                print(self) # todo remove this startup hack
+                # todo remove this startup hack
 
             if self._user_input is not None:
                 self._direction = self._user_input.get_direction()
@@ -101,7 +104,6 @@ class Bellhop:
         return False
 
     def _goto_next_state(self):
-        print(self)
         self._curr_state = self._next_state
 
     def get_state(self):
@@ -112,6 +114,9 @@ class Bellhop:
 
     def get_people_waiting(self):
         return self._passengers.get_passengers_waiting_by_floor()
+
+    def get_current_floor(self):
+        return self._curr_floor
 
     def make_random_passenger(self, force=False):
         if force or random.random() < PASSENGER_PCT_CHANCE_PER_TICK:
@@ -162,7 +167,7 @@ class Passenger:
     def pick_up(self):
         assert(not self._in_elevator and not self._dropped_off)
         self._in_elevator = True
-        print("Picked up passenger ", self._id)
+        print("Picked up passenger ", self._id) #TODO how does the viewer find out there was a pickup?
 
     def drop_off(self):
         assert(self._in_elevator)
