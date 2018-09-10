@@ -128,7 +128,7 @@ class Bellhop(BellhopViewInterface):
             self._passengers.add_passenger(p)
 
     def _change_floor(self):
-        if self._direction == Direction.UP and self._curr_floor < self._num_floors:
+        if self._direction == Direction.UP and self._curr_floor < self._num_floors - 1:
             self._curr_floor += 1
             return True
         elif self._direction == Direction.DOWN and self._curr_floor > 0:

@@ -2,7 +2,7 @@ import pygame
 import sys
 import time
 from animation_controller import *
-from game_state import Passenger
+from model import Passenger
 
 size = width, height = 620, 440
 black = 0, 0, 0
