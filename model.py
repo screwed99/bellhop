@@ -31,10 +31,6 @@ class BellhopViewInterface(abc.ABC):
 
 
 class Bellhop(BellhopViewInterface):
-    REQUIRED_SNAPSHOT_KEYS = ("curr_state",
-                              "next_state",
-                              "passengers",
-                              )
 
     def __init__(self, num_floors, capacity):
         self._curr_state = State.WAIT_INPUT
@@ -58,26 +54,25 @@ class Bellhop(BellhopViewInterface):
 
         self.make_random_passenger()
         if self._curr_state == State.ARRIVING:
-            self._setup_next_state(State.ARRIVING, State.PEOPLE_OFF, STATE_TIME_ARRIVAL_SECONDS)
+            self._setup_next_state(State.PEOPLE_OFF, STATE_TIME_ARRIVAL_SECONDS)
             if self._state_timeout():
                 # more actions?
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_OFF:
-            self._setup_next_state(State.PEOPLE_OFF, State.PEOPLE_ON, STATE_TIME_PEOPLE_OFF_SECONDS)
+            self._setup_next_state(State.PEOPLE_ON, STATE_TIME_PEOPLE_OFF_SECONDS)
             self._passengers.drop_off(self.get_current_floor())
             if self._state_timeout():
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_ON:
-            self._setup_next_state(State.PEOPLE_ON, State.WAIT_INPUT, STATE_TIME_PEOPLE_ON_SECONDS)
+            self._setup_next_state(State.WAIT_INPUT, STATE_TIME_PEOPLE_ON_SECONDS)
             self._passengers.pick_up(self.get_current_floor())
             if self._state_timeout():
                 self._goto_next_state()
 
         elif self._curr_state == State.WAIT_INPUT:
-            changed = self._setup_next_state(State.WAIT_INPUT,
-                                             State.MOVING,
+            changed = self._setup_next_state(State.MOVING,
                                              STATE_TIME_PEOPLE_ON_SECONDS)
             if changed:
                 self.make_random_passenger(force=True)
@@ -90,13 +85,13 @@ class Bellhop(BellhopViewInterface):
                     self._goto_next_state()
 
         elif self._curr_state == State.MOVING:
-            self._setup_next_state(State.MOVING, State.ARRIVING, STATE_TIME_MOVING_SECONDS)
+            self._setup_next_state(State.ARRIVING, STATE_TIME_MOVING_SECONDS)
             if self._state_timeout():
                 self._goto_next_state()
         else:
             raise NotImplementedError
 
-    def _setup_next_state(self, in_state, next_state, timeout=0.):
+    def _setup_next_state(self, next_state, timeout=0.):
         if self._curr_state == self._next_state:
             self._next_state = next_state
             self._state_leave = time.time() + timeout
