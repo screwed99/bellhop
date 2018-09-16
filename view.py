@@ -1,4 +1,6 @@
 from model import BellhopViewInterface
+from enums import State
+import os
 
 """
 # controls
@@ -37,14 +39,18 @@ class BellhopViewer(BellhopViewInterface):
 
 class DebugView(object):
 
-    def __init__(self, bellhop_viewer):
+    def __init__(self, bellhop_viewer, clear=True):
         self._bellhop_viewer = bellhop_viewer
+        self.clear = clear
 
     def print_game(self):
         print(self)
 
     def run(self):
-        self.print_game()
+        if self.clear:
+            os.system('clear')
+        if self._bellhop_viewer.get_state() == State.WAIT_INPUT:
+            self.print_game()
 
     def __str__(self):
         ret = "{} ON {} | ".format(self._bellhop_viewer.get_state(), self._bellhop_viewer.get_current_floor())
