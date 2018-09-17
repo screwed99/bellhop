@@ -145,12 +145,12 @@ class ConsoleView(object):
         self.print_game()
 
     def print_game(self):
-        floors = [self.get_floor_with_people(floor_num) for floor_num in range(self._num_floors)]
+        floors = [self.get_floor_with_people(floor_num) for floor_num in (range(self._num_floors))]
         elevator = self.get_elevator_with_people()
         elevator_at_floor = self._bellhop_viewer.get_current_floor()
         floors[elevator_at_floor] = concat_by_line([floors[elevator_at_floor], elevator])
         #TODO instead merge floors into one str, then place elevator at correct level so feet are level
-        for floor in floors:
+        for floor in reversed(floors):
             print(floor)
 
 
