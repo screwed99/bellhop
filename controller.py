@@ -1,8 +1,9 @@
 import time
 
 from model import Bellhop
-from view import BellhopViewer, DebugView, ConsoleView
+from view import BellhopViewer, DebugView
 from enums import State, Direction
+from scratch import ConsoleView
 
 # todo MAX how does user input look?
 # todo MAX is this sanitized?
@@ -108,5 +109,5 @@ class GameControllerConsoleView(object):
 
 
 if __name__ == '__main__':
-    game = GameController(4, 10)
+    game = GameControllerConsoleView(4, 10)
     game.run()

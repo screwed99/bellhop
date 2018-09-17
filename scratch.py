@@ -136,7 +136,7 @@ class ConsoleView(object):
 
 
     def __init__(self, bellhop_viewer, model_vars):
-        #self._bellhop_viewer = bellhop_viewer
+        self._bellhop_viewer = bellhop_viewer
         self._num_floors = model_vars['num_floors']
         self._capacity = model_vars['capacity']
 
@@ -145,27 +145,30 @@ class ConsoleView(object):
         self.print_game()
 
     def print_game(self):
-        floors = [self.get_floor_with_people() for floor_num in range(self._num_floors)]
+        floors = [self.get_floor_with_people(floor_num) for floor_num in range(self._num_floors)]
         elevator = self.get_elevator_with_people()
-        #print(elevator)
-        elevator_at_floor = 2
+        elevator_at_floor = self._bellhop_viewer.get_current_floor()
         floors[elevator_at_floor] = concat_by_line([floors[elevator_at_floor], elevator])
         #TODO instead merge floors into one str, then place elevator at correct level so feet are level
         for floor in floors:
             print(floor)
 
 
-    def get_floor_with_people(self):
-        #TODO paramaterize with correct floor
-        id_list = [1,2,3]
+    def get_floor_with_people(self, floor_num):
+        passengers = self._bellhop_viewer.get_people_waiting().get(floor_num, [])
+        if len(passengers) == 0:
+            return Assets.FLOOR
+        id_list = [p._id for p in passengers]
         people = [Assets.render_passenger(id) for id in id_list]
         merged_people = Assets.merge_passengers(people)
         floor_with_people = Assets.put_people_in_floor(merged_people)
         return floor_with_people
 
     def get_elevator_with_people(self):
-        #TODO
-        id_list = [4, 5]
+        passengers = self._bellhop_viewer.get_elevator_contents()
+        if len(passengers) == 0:
+            return Assets.ELEVATOR
+        id_list = [p._id for p in passengers]
         people = [Assets.render_passenger(id) for id in id_list]
         merged_people = Assets.merge_passengers(people)
         elevator_with_people = Assets.put_people_in_elevator(merged_people)
@@ -174,6 +177,6 @@ class ConsoleView(object):
 
 
 
-model_vars = dict(num_floors=4, capacity=14)
-cv = ConsoleView(None, model_vars)
-cv.run()
+#model_vars = dict(num_floors=4, capacity=14)
+#cv = ConsoleView(None, model_vars)
+#cv.run()
