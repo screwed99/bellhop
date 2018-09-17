@@ -66,3 +66,23 @@ class DebugView(object):
                 ret += "{} ".format(y)
             ret += "\n"
         return ret
+
+
+class ConsoleView(object):
+
+    def __init__(self, bellhop_viewer, model_vars):
+        self._bellhop_viewer = bellhop_viewer
+        self._num_floors = model_vars['num_floors']
+        self._capacity = model_vars['capacity']
+
+    def run(self):
+        os.system('clear')
+        if self._bellhop_viewer.get_state() == State.WAIT_INPUT:
+            self.print_game()
+
+    def print_game(self):
+        s_floors = """
+        |_______|
+        """*self._num_floors
+
+        print(s_floors)
