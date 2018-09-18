@@ -158,8 +158,8 @@ class ConsoleView(object):
         passengers = self._bellhop_viewer.get_people_waiting().get(floor_num, [])
         if len(passengers) == 0:
             return Assets.FLOOR
-        id_list = [p._id for p in passengers]
-        people = [Assets.render_passenger(id) for id in id_list]
+        destination_list = [p._desired_floor for p in passengers]
+        people = [Assets.render_passenger(dest) for dest in destination_list]
         merged_people = Assets.merge_passengers(people)
         floor_with_people = Assets.put_people_in_floor(merged_people)
         return floor_with_people
@@ -168,8 +168,8 @@ class ConsoleView(object):
         passengers = self._bellhop_viewer.get_elevator_contents()
         if len(passengers) == 0:
             return Assets.ELEVATOR
-        id_list = [p._id for p in passengers]
-        people = [Assets.render_passenger(id) for id in id_list]
+        destination_list = [p._desired_floor for p in passengers]
+        people = [Assets.render_passenger(dest) for dest in destination_list]
         merged_people = Assets.merge_passengers(people)
         elevator_with_people = Assets.put_people_in_elevator(merged_people)
         return elevator_with_people

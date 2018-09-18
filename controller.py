@@ -109,5 +109,5 @@ class GameControllerConsoleView(object):
 
 
 if __name__ == '__main__':
-    game = GameControllerConsoleView(4, 10)
+    game = GameControllerConsoleView(7, 10)
     game.run()
