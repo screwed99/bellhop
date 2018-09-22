@@ -1,14 +1,14 @@
 import ast
 
 class Level():
-    def __init__(self, filename=''):
+    def __init__(self, filename: str=''):
         self._events = {}
 
         self._level_name = ''
         self._num_floors = 0
         self._total_time_sec = 0.
 
-        if filename is not '':
+        if filename != '':
             self.parse_from_file(filename)
 
     # todo implement interface for getting
@@ -24,8 +24,8 @@ class Level():
                "--Events--:\n{}" \
                "".format(self._level_name, self._num_floors, self._total_time_sec, self._events)
 
-    # todo more error checking? more features?
-    def parse_from_file(self, filename):
+    # todo more features
+    def parse_from_file(self, filename: str):
         level_line_seen = False
         with open(filename, 'r') as f:
             for line in f:
@@ -42,15 +42,27 @@ class Level():
                 elif line.startswith('end_level'):
                     break
                 else:
-                    separator = line.find(':')
-                    if separator == -1:
-                        raise IOError("Invalid format, could not find separator(:) on line {}".format(line))
-                    time = float(line[:separator])
-                    if time in self._events.keys():
-                        raise IOError("Invalid format, timestamp {} seen again on line {}", time, line)
-                    self._events[time] = ast.literal_eval(line[separator + 1:])
+                    self.parse_line(filename, line)
 
         if not level_line_seen:
             raise IOError("Did not see a level line in file {}".format(filename))
+
+    def parse_line(self, filename, line):
+        separator = line.find(':')
+        if separator == -1:
+            raise IOError("Invalid format in {}, could not find separator(:) on line {}".format(filename, line))
+
+        try:
+            time = float(line[:separator])
+        except ValueError:
+            raise IOError("Invalid format in {}, could not parse float from {}".format(filename, line[:separator]))
+
+        if time in self._events.keys():
+            raise IOError("Invalid format in {}, timestamp {} seen again on line {}".format(filename, time, line))
+        try:
+            self._events[time] = ast.literal_eval(line[separator + 1:])
+
+        except:
+            raise IOError("Invalid format in {}, could not parse dict from {}".format(filename, line[separator + 1:]))
 
 
