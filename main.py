@@ -2,7 +2,7 @@ import pygame
 import sys
 import time
 from animation_controller import *
-from model import Passenger
+from model.model import Passenger
 
 size = width, height = 620, 440
 black = 0, 0, 0
@@ -23,6 +23,7 @@ passengers = [
 
 pygame.init()
 screen = pygame.display.set_mode(size)
+clock = pygame.time.Clock()
 animation_handler = AnimationHandler()
 view_dimensions = ViewDimensions(0, 0, width, height)
 leave_speed = (5, 0)
@@ -59,4 +60,4 @@ while True:
 
     pygame.display.flip()
 
-    time.sleep(1/30)
+    clock.tick(30)

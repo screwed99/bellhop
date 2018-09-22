@@ -1,9 +1,8 @@
 import time
 
 from model.model import Bellhop
-from view import BellhopViewer, DebugView
+from view import BellhopViewer, DebugView, ConsoleView
 from enums import State, Direction
-from scratch import ConsoleView
 
 
 
