@@ -16,7 +16,7 @@ STATE_TIME_MOVING_SECONDS = 2
 PASSENGER_PCT_CHANCE_PER_TICK = 0.1
 
 
-class BellhopViewInterface(abc.ABC):
+class BellhopModelInterface(abc.ABC):
 
     @abc.abstractmethod
     def get_state(self) -> State:
@@ -36,7 +36,7 @@ class BellhopViewInterface(abc.ABC):
 
 
 
-class Bellhop(BellhopViewInterface):
+class Bellhop(BellhopModelInterface):
 
     def __init__(self, num_floors: int, capacity: int):
         self._curr_state: State = State.WAIT_INPUT

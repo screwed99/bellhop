@@ -1,7 +1,8 @@
-from model.model import BellhopViewInterface, Bellhop
+from model.model import BellhopModelInterface
 from enums import State
 from assets import Assets
 import os
+import abc
 
 
 """
@@ -13,55 +14,32 @@ self._indicators_lit = {key: False for key in range(0, self._num_floors)}
 self._elevator_moving = False
 """
 
-class BellhopViewer(BellhopViewInterface):
-    """
-    A possibly ridiculous way to pass the game instance to Viewers in a way that implements the interface.
-    Viewer classes should only ever have to call an instance of this class
-    It is the controller's job to push updates to the model with update_model
-    """
+class ViewInterface(abc.ABC):
 
-    def __init__(self, model: Bellhop):
-        self.model = model
+    @abc.abstractmethod
+    def paint(self) -> None:
+        pass
 
-    def update_model(self, new_model):
-        self.model = new_model
+class DebugView(ViewInterface):
 
-    def get_state(self):
-        return self.model.get_state()
-
-    def get_elevator_contents(self):
-        return self.model.get_elevator_contents()
-
-    def get_people_waiting(self):
-        return self.model.get_people_waiting()
-
-    def get_current_floor(self):
-        return self.model.get_current_floor()
-
-
-class DebugView(object):
-
-    def __init__(self, bellhop_viewer: BellhopViewer, clear: bool=True):
-        self._bellhop_viewer = bellhop_viewer
+    def __init__(self, bellhop_model: BellhopModelInterface, clear: bool=True):
+        self._bellhop_model = bellhop_model
         self.clear = clear
 
-    def print_game(self) -> None:
-        print(self)
-
-    def run(self) -> None:
+    def paint(self) -> None:
         if self.clear:
             os.system('clear')
-        if self._bellhop_viewer.get_state() == State.WAIT_INPUT:
-            self.print_game()
+        if self._bellhop_model.get_state() == State.WAIT_INPUT:
+            print(self)
 
     def __str__(self):
-        ret = "{} ON {} | ".format(self._bellhop_viewer.get_state(), self._bellhop_viewer.get_current_floor())
+        ret = "{} ON {} | ".format(self._bellhop_model.get_state(), self._bellhop_model.get_current_floor())
         ret += "\n|----- Elevator -----|\n"
-        people_in = self._bellhop_viewer.get_elevator_contents()
+        people_in = self._bellhop_model.get_elevator_contents()
         for x in people_in:
             ret += "| {} |\n".format(x)
         ret += "|____________________|\n"
-        people_waiting = self._bellhop_viewer.get_people_waiting()
+        people_waiting = self._bellhop_model.get_people_waiting()
         for x in people_waiting:
             ret += "{}\n".format(x)
             for y in people_waiting[x]:
@@ -70,22 +48,22 @@ class DebugView(object):
         return ret
 
 
-class ConsoleView(object):
+class ConsoleView(ViewInterface):
 
 
-    def __init__(self, bellhop_viewer, model_vars):
-        self._bellhop_viewer = bellhop_viewer
+    def __init__(self, bellhop_model: BellhopModelInterface, model_vars):
+        self._bellhop_model = bellhop_model
         self._num_floors = model_vars['num_floors']
         self._capacity = model_vars['capacity']
 
-    def run(self):
+    def paint(self):
         os.system('clear')
         self.print_game()
 
     def print_game(self):
         floors = [self.get_floor_with_people(floor_num) for floor_num in (range(self._num_floors))]
         elevator = self.get_elevator_with_people()
-        elevator_at_floor = self._bellhop_viewer.get_current_floor()
+        elevator_at_floor = self._bellhop_model.get_current_floor()
         floors[elevator_at_floor] = self._concat_by_line([floors[elevator_at_floor], elevator])
         #TODO instead merge floors into one str, then place elevator at correct level so feet are level
         for floor in reversed(floors):
@@ -93,7 +71,7 @@ class ConsoleView(object):
 
 
     def get_floor_with_people(self, floor_num):
-        passengers = self._bellhop_viewer.get_people_waiting().get(floor_num, [])
+        passengers = self._bellhop_model.get_people_waiting().get(floor_num, [])
         if len(passengers) == 0:
             return Assets.FLOOR
         destination_list = [p._desired_floor for p in passengers]
@@ -103,7 +81,7 @@ class ConsoleView(object):
         return floor_with_people
 
     def get_elevator_with_people(self):
-        passengers = self._bellhop_viewer.get_elevator_contents()
+        passengers = self._bellhop_model.get_elevator_contents()
         if len(passengers) == 0:
             return Assets.ELEVATOR
         destination_list = [p._desired_floor for p in passengers]

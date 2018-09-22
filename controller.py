@@ -1,17 +1,14 @@
 import time
-
 from model.model import Bellhop
-from view import BellhopViewer, DebugView, ConsoleView
+from view import ViewInterface
 from enums import State, Direction
-
 
 
 class GameController(object):
 
-    def __init__(self, num_floors, capacity):
-        self._game = Bellhop(num_floors, capacity)
-        self._viewer = BellhopViewer(self._game)
-        self._view = DebugView(self._viewer)
+    def __init__(self, game: Bellhop, view: ViewInterface):
+        self._game = game
+        self._view = view
 
     def _collect_input(self):
         input_valid = False
@@ -39,22 +36,8 @@ class GameController(object):
                 self._game.step(None)
 
             #Viewer stuff
-            self._viewer.update_model(self._game) # is it necessary to replace the model or do they share a reference?
-            self._view.run()
+            self._view.paint()
 
             #Control
             time.sleep(0.1)
 
-
-class ConsoleViewGameController(GameController):
-
-    def __init__(self, num_floors: int=4, capacity: int=10):
-        GameController.__init__(self, num_floors, capacity)
-        model_vars = dict(num_floors=num_floors, capacity=capacity)
-        self._view = ConsoleView(self._viewer, model_vars)
-
-
-
-if __name__ == '__main__':
-    game = ConsoleViewGameController(3, 10)
-    game.run()
