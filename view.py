@@ -22,7 +22,7 @@ class ViewInterface(abc.ABC):
 
 class DebugView(ViewInterface):
 
-    def __init__(self, bellhop_model: BellhopModelInterface, clear: bool=True):
+    def __init__(self, bellhop_model: BellhopModelInterface, clear: bool=False):
         self._bellhop_model = bellhop_model
         self.clear = clear
 
