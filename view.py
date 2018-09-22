@@ -1,6 +1,7 @@
-from model import BellhopViewInterface
+from model.model import BellhopViewInterface, Bellhop
 from enums import State
 import os
+
 
 """
 # controls
@@ -18,8 +19,8 @@ class BellhopViewer(BellhopViewInterface):
     It is the controller's job to push updates to the model with update_model
     """
 
-    def __init__(self, model):
-        self.model = model  # TODO make sure this is a Bellhop instance
+    def __init__(self, model: Bellhop):
+        self.model = model
 
     def update_model(self, new_model):
         self.model = new_model
@@ -39,14 +40,14 @@ class BellhopViewer(BellhopViewInterface):
 
 class DebugView(object):
 
-    def __init__(self, bellhop_viewer, clear=True):
+    def __init__(self, bellhop_viewer: BellhopViewer, clear: bool=True):
         self._bellhop_viewer = bellhop_viewer
         self.clear = clear
 
-    def print_game(self):
+    def print_game(self) -> None:
         print(self)
 
-    def run(self):
+    def run(self) -> None:
         if self.clear:
             os.system('clear')
         if self._bellhop_viewer.get_state() == State.WAIT_INPUT:
@@ -70,17 +71,17 @@ class DebugView(object):
 
 class ConsoleView(object):
 
-    def __init__(self, bellhop_viewer, model_vars):
+    def __init__(self, bellhop_viewer: BellhopViewer, model_vars: dict):
         self._bellhop_viewer = bellhop_viewer
         self._num_floors = model_vars['num_floors']
         self._capacity = model_vars['capacity']
 
-    def run(self):
+    def run(self) -> None:
         os.system('clear')
         if self._bellhop_viewer.get_state() == State.WAIT_INPUT:
             self.print_game()
 
-    def print_game(self):
+    def print_game(self) -> None:
         s_floors = """
         |_______|
         """*self._num_floors
