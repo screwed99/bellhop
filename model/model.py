@@ -110,7 +110,7 @@ class Bellhop(BellhopModelInterface):
         self._curr_state = self._next_state
 
     def _get_space_available_in_elevator(self) -> int:
-        return len(self.get_elevator_contents()) - self._capacity
+        return self._capacity - len(self.get_elevator_contents())
 
     def get_state(self) -> State:
         return self._curr_state
