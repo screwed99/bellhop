@@ -1,8 +1,7 @@
-from model.model import BellhopModelInterface
-from enums import State
-from assets import Assets
 import abc
 
+from assets import Assets
+from model.model import BellhopModelInterface
 
 """
 # controls
@@ -37,32 +36,6 @@ class PyGameViewTextWriter:
         for i, line in enumerate(lines):
             text_surface = self._pygame_font.render(line, False, white)
             self._screen.blit(text_surface, (x, y + self._font_size * i))
-
-class DebugView(ViewInterface):
-
-    def __init__(self, bellhop_model: BellhopModelInterface, writer: PyGameViewTextWriter):
-        self._bellhop_model = bellhop_model
-        self._writer = writer
-
-    def paint(self) -> None:
-        if self._bellhop_model.get_state() == State.WAIT_INPUT:
-            game_text = self.__str__()
-            self._writer.write(game_text)
-
-    def __str__(self):
-        ret = "{} ON {} | ".format(self._bellhop_model.get_state(), self._bellhop_model.get_current_floor())
-        ret += "\n|----- Elevator -----|\n"
-        people_in = self._bellhop_model.get_elevator_contents()
-        for x in people_in:
-            ret += "| {} |\n".format(x)
-        ret += "|____________________|\n"
-        people_waiting = self._bellhop_model.get_people_waiting()
-        for x in people_waiting:
-            ret += "{}\n".format(x)
-            for y in people_waiting[x]:
-                ret += "{} ".format(y)
-            ret += "\n"
-        return ret
 
 
 class ConsoleView(ViewInterface):
