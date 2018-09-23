@@ -13,21 +13,20 @@ class GameController(object):
 
     # TODO extract input to a pygame version so we can get a debug console version still
     def _collect_input(self):
-        input_valid = False
         user_input = None
-        while not input_valid:
-            event = pygame.event.poll()
-            while event.type != pygame.KEYDOWN:
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                event = pygame.event.poll()
+        events = pygame.event.get()
+        if len(events) == 0:
+            return user_input
+        else:
+            event = events[-1]
+        if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_u:
-                input_valid = True
                 user_input = Direction.UP
             elif event.key == pygame.K_d:
-                input_valid = True
                 user_input = Direction.DOWN
+        elif event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
         return user_input
 
     def run(self, clock):
