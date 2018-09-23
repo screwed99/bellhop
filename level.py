@@ -1,8 +1,8 @@
 import ast
-
+from typing import Optional, List, Dict
 
 class Level(object):
-    NULL_EVENT = (float('inf'), None)
+    NULL_EVENT = (-1, None)
 
     def __init__(self, filename: str=''):
         self._current_event = 0
@@ -22,7 +22,7 @@ class Level(object):
     def get_capacity(self) -> int:
         return self._capacity
 
-    def get_next_event(self, move: int) -> {int, [int]}:  #TODO type hinting for null event?
+    def get_next_event(self, move: int) -> Optional[Dict[int, List[int]]]:  #TODO type hinting for null event?
         if move >= self._peek_next_event()[0]:
             event = self._pop_next_event()
         else:

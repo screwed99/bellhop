@@ -36,7 +36,6 @@ class BellhopModelInterface(abc.ABC):
         pass
 
 
-
 class Bellhop(BellhopModelInterface):
 
     def __init__(self, level: Level):
@@ -62,7 +61,7 @@ class Bellhop(BellhopModelInterface):
         if self._curr_state == State.ARRIVING:
             self._setup_next_state(State.PEOPLE_OFF, STATE_TIME_ARRIVAL_SECONDS)
             if self._state_timeout():
-                self.make_passengers_from_schedule(self)
+                self.make_passengers_from_schedule()
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_OFF:
@@ -133,8 +132,9 @@ class Bellhop(BellhopModelInterface):
             self._passengers.add_passenger(p)
 
     def make_passengers_from_schedule(self) -> None:
-        event = self.level.get_next_event(self._move_count)
-        if event[1] is not None: #TODO ungrossify
+        _, event = self.level.get_next_event(self._move_count)
+        print("EVENT: ", event)
+        if event is not None: #TODO ungrossify
             for start_floor in event:
                 for end_floor in event[start_floor]:
                     p = Passenger(start_floor, end_floor)

@@ -4,13 +4,15 @@ import pygame
 from controller.controller import GameController
 from controller.debug_controller import DebugGameController
 from model.model import Bellhop
+from level import Level
 from view.console_view import ConsoleView, PyGameViewTextWriter
 from view.debug_view import DebugView
 from view.view import BellhopView, PyGameImageWriter
 
 
-def build_game_controller(width, height, num_floors=3, capacity=10) -> GameController:
-    model = Bellhop(num_floors, capacity)
+def build_game_controller(width, height, level_path='levels/example.txt') -> GameController:
+    level = Level(level_path)
+    model = Bellhop(level)
     size = width, height
     pygame.init()
     screen = pygame.display.set_mode(size)
@@ -18,17 +20,18 @@ def build_game_controller(width, height, num_floors=3, capacity=10) -> GameContr
     font_size = 20
     pygame_font = pygame.font.SysFont('Courier New', font_size)
     writer = PyGameViewTextWriter(screen, pygame_font, font_size)
-    model_vars = dict(num_floors=num_floors, capacity=capacity)
+    model_vars = dict(num_floors=level.get_num_floors(), capacity=level.get_capacity()) #TODO interf include these vars
     view = ConsoleView(model, model_vars, writer)
     return GameController(model, view)
 
-def build_visuals_controller(width, height, num_floors=3, capacity=5) -> GameController:
-    model = Bellhop(num_floors, capacity)
+def build_visuals_controller(width, height, level_path='levels/example.txt') -> GameController:
+    level = Level(level_path)
+    model = Bellhop(level)
     size = width, height
     pygame.init()
     screen = pygame.display.set_mode(size)
     writer = PyGameImageWriter(screen)
-    model_vars = dict(num_floors=num_floors, capacity=capacity)
+    model_vars = dict(num_floors=level.get_num_floors(), capacity=level.get_capacity()) #TODO interf include these vars
     view = BellhopView(model, model_vars, writer)
     return GameController(model, view)
 
