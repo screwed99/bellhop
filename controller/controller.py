@@ -1,5 +1,5 @@
 from model.model import Bellhop
-from view import ViewInterface
+from view.view import ViewInterface
 from enums import State, Direction
 import pygame
 import sys
@@ -11,7 +11,6 @@ class GameController(object):
         self._game = game
         self._view = view
 
-    # TODO extract input to a pygame version so we can get a debug console version still
     def _collect_input(self):
         user_input = None
         events = pygame.event.get()

@@ -1,6 +1,7 @@
-import pygame
 import sys
-from view_model import *
+import pygame
+
+from experimental_code.view_model import *
 from model.model import Passenger
 
 size = width, height = 620, 440

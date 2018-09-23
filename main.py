@@ -1,10 +1,12 @@
-from controller import GameController
-from debug_controller import DebugGameController
-from model.model import Bellhop
-from view import ConsoleView, PyGameViewTextWriter
-from debug_view import DebugView
-import pygame
 import argparse
+
+import pygame
+
+from controller.controller import GameController
+from controller.debug_controller import DebugGameController
+from model.model import Bellhop
+from view.view import ConsoleView, PyGameViewTextWriter
+from view.debug_view import DebugView
 
 
 def build_game_controller(num_floors=3, capacity=10) -> GameController:

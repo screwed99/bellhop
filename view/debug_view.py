@@ -2,7 +2,7 @@ import os
 
 from enums import State
 from model.model import BellhopModelInterface
-from view import ViewInterface
+from view.view import ViewInterface
 
 
 class DebugView(ViewInterface):
