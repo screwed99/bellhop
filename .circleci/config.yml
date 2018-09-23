@@ -24,6 +24,9 @@ jobs:
             source activate bellhop
             python -m unittest discover --pattern="*_tests.py"
 
+      - store_test_results:
+          path: test-reports
+
       - store_artifacts:
           path: test-reports
           destination: test-reports
