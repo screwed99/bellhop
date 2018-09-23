@@ -4,6 +4,7 @@ import time
 from typing import Optional
 
 from enums import State, Direction
+from level import Level
 from model.gaggle_of_passengers import GaggleOfPassengers
 from model.passenger import Passenger
 
@@ -38,31 +39,30 @@ class BellhopModelInterface(abc.ABC):
 
 class Bellhop(BellhopModelInterface):
 
-    def __init__(self, num_floors: int, capacity: int):
+    def __init__(self, level: Level):
+        self.level = level
         self._curr_state: State = State.WAIT_INPUT
         self._next_state: State = State.WAIT_INPUT
         self._state_leave: float = time.time() + float('inf')
         self._user_input: Direction = None
+        self._move_count = 0
 
         # floors
-        self._num_floors: int = num_floors
+        self._num_floors: int = self.level.get_num_floors()
         self._curr_floor: int = 0
-
 
         # people
         self._passengers: GaggleOfPassengers = GaggleOfPassengers()
-        # todo enforce capacity
-        self._capacity: int = capacity
+        self._capacity: int = self.level.get_capacity()
 
 
     def step(self, user_input: Optional[Direction]):
         self._user_input = user_input
 
-        self.make_random_passenger()
         if self._curr_state == State.ARRIVING:
             self._setup_next_state(State.PEOPLE_OFF, STATE_TIME_ARRIVAL_SECONDS)
             if self._state_timeout():
-                # more actions?
+                self.make_passengers_from_schedule(self)
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_OFF:
@@ -72,7 +72,7 @@ class Bellhop(BellhopModelInterface):
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_ON:
-            #TODO make smart passengers that only get on if elevator is heading right direction
+            #TODO smart passengers that only get on if elevator is heading right direction
             self._setup_next_state(State.WAIT_INPUT, STATE_TIME_PEOPLE_ON_SECONDS)
             qty_to_pick_up = self._get_space_available_in_elevator()
             self._passengers.pick_up(self.get_current_floor(), qty_to_pick_up)
@@ -82,9 +82,6 @@ class Bellhop(BellhopModelInterface):
         elif self._curr_state == State.WAIT_INPUT:
             changed = self._setup_next_state(State.MOVING,
                                              STATE_TIME_PEOPLE_ON_SECONDS)
-            if changed:
-                self.make_random_passenger(force=True)
-                # todo remove this startup hack
 
             if self._user_input is not None:
                 self._direction = self._user_input
@@ -107,6 +104,7 @@ class Bellhop(BellhopModelInterface):
         return False
 
     def _goto_next_state(self) -> None:
+        self._move_count += 1
         self._curr_state = self._next_state
 
     def _get_space_available_in_elevator(self) -> int:
@@ -125,6 +123,7 @@ class Bellhop(BellhopModelInterface):
         return self._curr_floor
 
     def make_random_passenger(self, force: bool=False) -> None:
+        # what to do with this when running a level?
         if force or random.random() < PASSENGER_PCT_CHANCE_PER_TICK:
             start_floor = random.randint(0, self._num_floors - 1)
             end_floor = start_floor
@@ -132,6 +131,16 @@ class Bellhop(BellhopModelInterface):
                 end_floor = random.randint(0, self._num_floors - 1)
             p = Passenger(start_floor, end_floor)
             self._passengers.add_passenger(p)
+
+    def make_passengers_from_schedule(self) -> None:
+        event = self.level.get_next_event(self._move_count)
+        if event[1] is not None: #TODO ungrossify
+            for start_floor in event:
+                for end_floor in event[start_floor]:
+                    p = Passenger(start_floor, end_floor)
+                    self._passengers.add_passenger(p)
+        else:
+            pass
 
     def _change_floor(self) -> bool:
         if self._direction == Direction.UP and self._curr_floor < self._num_floors - 1:

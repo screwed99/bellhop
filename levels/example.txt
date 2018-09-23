@@ -1,14 +1,14 @@
 ## A game level definition
 ## Empty lines or lines prefaced with ## are treated as comments
 ## Format:
-## level $level $num_floors $length_in_seconds
+## level $level $num_floors $capacity $length_in_seconds
 ## $event_time:{$floor:$passengers, ...}
 ## (repeat previous line any number of times)
 ## end_level
 ## $passengers is a list of desired destination floors for new passengers
 ##
 
-level 1 5 60
+level 1 5 5 60
 0:{0:[1,2,3], 1:[0,2]}
 5:{2:[3,0]}
 20:{3:[0,4], 5:[0,0,1]}
