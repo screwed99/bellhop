@@ -1,5 +1,5 @@
 from model.model import Bellhop
-from view.view import ViewInterface
+from view.view_interface import ViewInterface
 from enums import State, Direction
 import pygame
 import sys
