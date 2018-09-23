@@ -23,8 +23,11 @@ class GaggleOfPassengers:
             waiting_by_floor[floor].append(passenger)
         return waiting_by_floor
 
-    def pick_up(self, floor: int) -> None:
-        for passenger in self.get_passengers_waiting_by_floor().get(floor, []):
+    def pick_up(self, floor: int, qty_to_pick_up: int) -> None:
+        candidates = self.get_passengers_waiting_by_floor().get(floor, [])
+        candidates.sort(key=lambda p: p.get_id()) #Prioritize by id
+        for i in range(min(qty_to_pick_up, len(candidates))):
+            passenger = candidates[i]
             passenger.pick_up()
 
     def drop_off(self, floor: int) -> None:

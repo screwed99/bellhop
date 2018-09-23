@@ -72,8 +72,10 @@ class Bellhop(BellhopModelInterface):
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_ON:
+            #TODO make smart passengers that only get on if elevator is heading right direction
             self._setup_next_state(State.WAIT_INPUT, STATE_TIME_PEOPLE_ON_SECONDS)
-            self._passengers.pick_up(self.get_current_floor())
+            qty_to_pick_up = self._get_space_available_in_elevator()
+            self._passengers.pick_up(self.get_current_floor(), qty_to_pick_up)
             if self._state_timeout():
                 self._goto_next_state()
 
@@ -106,6 +108,9 @@ class Bellhop(BellhopModelInterface):
 
     def _goto_next_state(self) -> None:
         self._curr_state = self._next_state
+
+    def _get_space_available_in_elevator(self) -> int:
+        return len(self.get_elevator_contents()) - self._capacity
 
     def get_state(self) -> State:
         return self._curr_state
