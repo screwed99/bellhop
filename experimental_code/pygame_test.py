@@ -1,5 +1,4 @@
 import sys
-
 import pygame
 
 from experimental_code.view_model import *
