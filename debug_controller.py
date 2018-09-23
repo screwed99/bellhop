@@ -1,36 +1,33 @@
+import time
 from model.model import Bellhop
 from view import ViewInterface
 from enums import State, Direction
-import pygame
-import sys
 
 
-class GameController(object):
+class DebugGameController(object):
 
     def __init__(self, game: Bellhop, view: ViewInterface):
         self._game = game
         self._view = view
 
-    # TODO extract input to a pygame version so we can get a debug console version still
     def _collect_input(self):
+        input_valid = False
         user_input = None
-        events = pygame.event.get()
-        if len(events) == 0:
-            return user_input
-        else:
-            event = events[-1]
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_u:
+        while not input_valid:
+            text = input("Enter (u)p/(d)own:")
+            if text.lower() in ('u', 'up', 'w'):
                 user_input = Direction.UP
-            elif event.key == pygame.K_d:
+                input_valid = True
+            elif text.lower() in ('d', 'down', 's'):
                 user_input = Direction.DOWN
-        elif event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
+                input_valid = True
+            elif text.lower() == 'q':
+                exit(1) #filthy low level gutter dwelling scum code
         return user_input
 
-    def run(self, clock):
+    def run(self):
         while True:
+            #Model stuff
             curr_state = self._game.get_state()
             if curr_state == State.WAIT_INPUT:
                 user_input = self._collect_input()
@@ -38,7 +35,9 @@ class GameController(object):
             else:
                 self._game.step(None)
 
+            #Viewer stuff
             self._view.paint()
-            pygame.display.flip()
 
-            clock.tick(30)
+            #Control
+            time.sleep(0.1)
+
