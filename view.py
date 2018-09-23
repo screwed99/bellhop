@@ -1,7 +1,6 @@
 from model.model import BellhopModelInterface
 from enums import State
 from assets import Assets
-import os
 import abc
 
 
@@ -20,17 +19,35 @@ class ViewInterface(abc.ABC):
     def paint(self) -> None:
         pass
 
+class PyGameViewTextWriter:
+
+    def __init__(self, screen, pygame_font, font_size):
+        self._screen = screen
+        self._pygame_font = pygame_font
+        self._font_size = font_size
+
+    def write(self, game_text):
+        self._render_multi_line(game_text, 0, 0)
+
+    def _render_multi_line(self, text, x, y):
+        white = 255, 255, 255
+        black = 0, 0, 0
+        self._screen.fill(black)
+        lines = text.splitlines()
+        for i, line in enumerate(lines):
+            text_surface = self._pygame_font.render(line, False, white)
+            self._screen.blit(text_surface, (x, y + self._font_size * i))
+
 class DebugView(ViewInterface):
 
-    def __init__(self, bellhop_model: BellhopModelInterface, clear: bool=False):
+    def __init__(self, bellhop_model: BellhopModelInterface, writer: PyGameViewTextWriter):
         self._bellhop_model = bellhop_model
-        self.clear = clear
+        self._writer = writer
 
     def paint(self) -> None:
-        if self.clear:
-            os.system('clear')
         if self._bellhop_model.get_state() == State.WAIT_INPUT:
-            print(self)
+            game_text = self.__str__()
+            self._writer.write(game_text)
 
     def __str__(self):
         ret = "{} ON {} | ".format(self._bellhop_model.get_state(), self._bellhop_model.get_current_floor())
@@ -51,13 +68,13 @@ class DebugView(ViewInterface):
 class ConsoleView(ViewInterface):
 
 
-    def __init__(self, bellhop_model: BellhopModelInterface, model_vars):
+    def __init__(self, bellhop_model: BellhopModelInterface, model_vars, writer):
         self._bellhop_model = bellhop_model
         self._num_floors = model_vars['num_floors']
         self._capacity = model_vars['capacity']
+        self._writer = writer
 
     def paint(self):
-        os.system('clear')
         self.print_game()
 
     def print_game(self):
@@ -66,8 +83,8 @@ class ConsoleView(ViewInterface):
         elevator_at_floor = self._bellhop_model.get_current_floor()
         floors[elevator_at_floor] = self._concat_by_line([floors[elevator_at_floor], elevator])
         #TODO instead merge floors into one str, then place elevator at correct level so feet are level
-        for floor in reversed(floors):
-            print(floor)
+        game_text = '\n'.join(reversed(floors))
+        self._writer.write(game_text)
 
 
     def get_floor_with_people(self, floor_num):

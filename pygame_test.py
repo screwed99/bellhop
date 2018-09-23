@@ -1,6 +1,5 @@
 import pygame
 import sys
-import time
 from view_model import *
 from model.model import Passenger
 
