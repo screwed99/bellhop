@@ -40,3 +40,7 @@ class Passenger:
 
     def is_dropped_off(self) -> bool:
         return self._dropped_off
+
+    def get_id(self) -> int:
+        return self._id
+
