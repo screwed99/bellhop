@@ -1,6 +1,6 @@
 import abc
 
-from assets import Assets
+from assets.console_assets import Assets
 from model.model import BellhopModelInterface
 
 """
