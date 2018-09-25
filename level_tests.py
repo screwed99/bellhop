@@ -12,9 +12,6 @@ level 1 5 5 3
 end_level
 """
 
-    def setUp(self)
-        pass
-
     @patch("builtins.open", new_callable=mock_open, read_data=_text_moves_out_of_order)
     def test__get_next_event__moves_out_of_order__returns_correct(self, mock_level_file_open):
 
