@@ -1,3 +1,5 @@
+from typing import Dict
+
 from model.passenger import Passenger
 
 
@@ -14,7 +16,7 @@ class GaggleOfPassengers:
     def get_passengers_waiting(self) -> [Passenger]:
         return [passenger for passenger in self._passengers if passenger.is_waiting_for_pickup()]
 
-    def get_passengers_waiting_by_floor(self) -> {int, Passenger}:
+    def get_passengers_waiting_by_floor(self) -> Dict[int, Passenger]:
         waiting_by_floor = {}
         for passenger in self.get_passengers_waiting():
             floor = passenger._floor_entered

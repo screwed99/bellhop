@@ -1,10 +1,11 @@
 class Passenger:
     id_num = 0
-    def __init__(self, floor_entered: int, desired_floor: int):
+
+    def __init__(self, floor_entered: int, desired_floor: int) -> None:
         self._floor_entered: int = floor_entered
         self._desired_floor: int = desired_floor
 
-# todo THIJS make passenger state enum
+        # todo THIJS make passenger state enum
         self._in_elevator: bool = False
         self._dropped_off: bool = False
         self._id: int = Passenger.id_num
