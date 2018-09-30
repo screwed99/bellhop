@@ -3,12 +3,17 @@ from typing import Optional, List, Dict
 
 
 class Level(object):
-    NULL_EVENT = (-1, None)
+    """
+    move: an int that describes the move number since level start
+    event: a dict that describes the passenger generation for a given move, or None
+    """
+
+    NULL_EVENT = None  # is making this an explicit variable even neccessary
 
     def __init__(self, filename: str='') -> None:
         #TODO separate parsing and state
         self._current_event = 0
-        self._events = []
+        self._events = {}
         self._level_name = ''
         self._num_floors = 0
         self._capacity = 0
@@ -23,32 +28,14 @@ class Level(object):
     def get_capacity(self) -> int:
         return self._capacity
 
-    def get_next_event(self, move: int) -> Optional[Dict[int, List[int]]]:  #TODO type hinting for null event?
-        if move >= self._peek_next_event()[0]:
-            event = self._pop_next_event()
-        else:
-            event = self.NULL_EVENT
-        return event
+    def get_event(self, move: int) -> Optional[Dict[int, List[int]]]:
+        return self._events.get(move, self.NULL_EVENT)
 
     def get_level_finish_move_number(self) -> int:
         return self._level_finish_move_number
 
     def get_level_name(self) -> str:
         return self._level_name
-
-    def _event_get(self, i): #TODO is this suss passing back NULL_EVENT?
-        if -len(self._events) <= i < len(self._events):
-            return self._events[i]
-        else:
-            return self.NULL_EVENT
-
-    def _peek_next_event(self):
-        return self._event_get(self._current_event)
-
-    def _pop_next_event(self):
-        event = self._event_get(self._current_event)
-        self._current_event += 1
-        return event
 
     def __str__(self):
         return "Level: {} Floors: {} Move #: {}\n" \
@@ -93,11 +80,11 @@ class Level(object):
         except ValueError:
             raise IOError("Invalid format in {}, could not parse int from {}".format(filename, line[:separator]))
 
-        if move == self._event_get(-1)[0]:
+        if move in self._events:
             raise IOError("Invalid format in {}, move {} seen again on line {}".format(filename, move, line))
+
         try:
-            tup = (move, ast.literal_eval(line[separator + 1:]))
-            self._events.append(tup)
+            self._events[move] = ast.literal_eval(line[separator + 1:])
         except:
             raise IOError("Invalid format in {}, could not parse dict from {}".format(filename, line[separator + 1:]))
 

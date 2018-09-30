@@ -21,8 +21,8 @@ class BellhopModel(IBellhopViewer, IBellhopController):
 
     def __init__(self, level: Level) -> None:
         self._level = level
-        self._curr_state: State = State.WAIT_INPUT
-        self._next_state: State = State.WAIT_INPUT
+        self._curr_state: State = State.ARRIVING
+        self._next_state: State = State.ARRIVING
         self._state_leave: float = time.time() + float('inf')
         self._user_input: Optional[Direction] = None
         self._move_count = 0
@@ -38,10 +38,10 @@ class BellhopModel(IBellhopViewer, IBellhopController):
     def get_state(self) -> State:
         return self._curr_state
 
-    def get_elevator_contents(self) -> [Passenger]:
+    def get_elevator_contents(self) -> List[Passenger]:
         return self._passengers.get_passengers_in_elevator()
 
-    def get_people_waiting(self) -> {int, Passenger}:
+    def get_people_waiting(self) -> Dict[int, List[Passenger]]:
         return self._passengers.get_passengers_waiting_by_floor()
 
     def get_current_floor(self) -> int:
@@ -71,13 +71,14 @@ class BellhopModel(IBellhopViewer, IBellhopController):
                 self._goto_next_state()
 
         elif self._curr_state == State.WAIT_INPUT:
-            changed = self._setup_next_state(State.MOVING,
-                                             STATE_TIME_PEOPLE_ON_SECONDS)
+            self._setup_next_state(State.MOVING,
+                                   STATE_TIME_PEOPLE_ON_SECONDS)
 
             if self._user_input is not None:
                 self._direction = self._user_input
                 self._user_input = None
                 if self._change_floor():
+                    self._move_count += 1
                     self._goto_next_state()
 
         elif self._curr_state == State.MOVING:
@@ -95,26 +96,13 @@ class BellhopModel(IBellhopViewer, IBellhopController):
         return False
 
     def _goto_next_state(self) -> None:
-        self._move_count += 1
         self._curr_state = self._next_state
 
     def _get_space_available_in_elevator(self) -> int:
         return self._capacity - len(self.get_elevator_contents())
 
-    def get_state(self) -> State:
-        return self._curr_state
-
-    def get_elevator_contents(self) -> List[Passenger]:
-        return self._passengers.get_passengers_in_elevator()
-
-    def get_people_waiting(self) -> Dict[int, List[Passenger]]:
-        return self._passengers.get_passengers_waiting_by_floor()
-
-    def get_current_floor(self) -> int:
-        return self._curr_floor
-
     def _make_random_passenger(self, force: bool=False) -> None:
-        # Might be useful to have levels support randomness. TODO remove or adapt
+        #TODO clean up depending on level's needs
         if force or random.random() < PASSENGER_PCT_CHANCE_PER_TICK:
             start_floor = random.randint(0, self._num_floors - 1)
             end_floor = start_floor
@@ -124,14 +112,14 @@ class BellhopModel(IBellhopViewer, IBellhopController):
             self._passengers.add_passenger(p)
 
     def _make_passengers_from_schedule(self) -> None:
-        _, event = self._level.get_next_event(self._move_count)
-        if event is not None: #TODO ungrossify
-            for start_floor in event:
-                for end_floor in event[start_floor]:
-                    p = Passenger(start_floor, end_floor)
-                    self._passengers.add_passenger(p)
-        else:
-            pass
+        #TODO support random passenger gen if asked by level
+        event = self._level.get_event(self._move_count)
+        if event is None:
+            return None
+        for start_floor in event:
+            for end_floor in event[start_floor]:
+                p = Passenger(start_floor, end_floor)
+                self._passengers.add_passenger(p)
 
     def _change_floor(self) -> bool:
         if self._direction == Direction.UP and self._curr_floor < self._num_floors - 1:
@@ -144,3 +132,10 @@ class BellhopModel(IBellhopViewer, IBellhopController):
 
     def _state_timeout(self) -> bool:
         return self._curr_state != self._next_state and self._state_leave > time.time()
+
+    def _is_game_finished(self) -> bool:
+        # TODO use this in controller
+        is_level_schedule_complete = self._level.get_level_finish_move_number() <= self._move_count
+        are_lobbies_empty = len(self._passengers.get_passengers_waiting_by_floor()) == 0
+        is_elevator_empty = len(self.get_elevator_contents()) == 0
+        return is_level_schedule_complete and are_lobbies_empty and is_elevator_empty
