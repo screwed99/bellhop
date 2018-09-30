@@ -36,8 +36,9 @@ def build_visuals_controller(width, height, level_path='levels/example.txt') -> 
     view = BellhopView(model, model_vars, writer)
     return BellhopController(model, view)
 
-def build_debug_game_controller(num_floors=3, capacity=10) -> DebugGameController:
-    model = BellhopModel(num_floors, capacity)
+def build_debug_game_controller(level_path='levels/example.txt') -> DebugGameController:
+    level = Level(level_path)
+    model = BellhopModel(level)
     view = DebugView(model)
     return DebugGameController(model, view)
 

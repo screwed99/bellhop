@@ -13,7 +13,7 @@ class Level(object):
     def __init__(self, filename: str='') -> None:
         #TODO separate parsing and state
         self._current_event = 0
-        self._events = {}
+        self._events: Dict = {}
         self._level_name = ''
         self._num_floors = 0
         self._capacity = 0
