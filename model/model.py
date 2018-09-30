@@ -39,7 +39,7 @@ class BellhopModelInterface(abc.ABC):
 class Bellhop(BellhopModelInterface):
 
     def __init__(self, level: Level):
-        self.level = level
+        self._level = level
         self._curr_state: State = State.WAIT_INPUT
         self._next_state: State = State.WAIT_INPUT
         self._state_leave: float = time.time() + float('inf')
@@ -47,13 +47,24 @@ class Bellhop(BellhopModelInterface):
         self._move_count = 0
 
         # floors
-        self._num_floors: int = self.level.get_num_floors()
+        self._num_floors: int = self._level.get_num_floors()
         self._curr_floor: int = 0
 
         # people
         self._passengers: GaggleOfPassengers = GaggleOfPassengers()
-        self._capacity: int = self.level.get_capacity()
+        self._capacity: int = self._level.get_capacity()
 
+    def get_state(self) -> State:
+        return self._curr_state
+
+    def get_elevator_contents(self) -> [Passenger]:
+        return self._passengers.get_passengers_in_elevator()
+
+    def get_people_waiting(self) -> {int, Passenger}:
+        return self._passengers.get_passengers_waiting_by_floor()
+
+    def get_current_floor(self) -> int:
+        return self._curr_floor
 
     def step(self, user_input: Optional[Direction]):
         self._user_input = user_input
@@ -61,7 +72,7 @@ class Bellhop(BellhopModelInterface):
         if self._curr_state == State.ARRIVING:
             self._setup_next_state(State.PEOPLE_OFF, STATE_TIME_ARRIVAL_SECONDS)
             if self._state_timeout():
-                self.make_passengers_from_schedule()
+                self._make_passengers_from_schedule()
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_OFF:
@@ -109,20 +120,8 @@ class Bellhop(BellhopModelInterface):
     def _get_space_available_in_elevator(self) -> int:
         return self._capacity - len(self.get_elevator_contents())
 
-    def get_state(self) -> State:
-        return self._curr_state
-
-    def get_elevator_contents(self) -> [Passenger]:
-        return self._passengers.get_passengers_in_elevator()
-
-    def get_people_waiting(self) -> {int, Passenger}:
-        return self._passengers.get_passengers_waiting_by_floor()
-
-    def get_current_floor(self) -> int:
-        return self._curr_floor
-
-    def make_random_passenger(self, force: bool=False) -> None:
-        # what to do with this when running a level?
+    def _make_random_passenger(self, force: bool=False) -> None:
+        # Might be useful to have levels support randomness. TODO remove or adapt
         if force or random.random() < PASSENGER_PCT_CHANCE_PER_TICK:
             start_floor = random.randint(0, self._num_floors - 1)
             end_floor = start_floor
@@ -131,9 +130,8 @@ class Bellhop(BellhopModelInterface):
             p = Passenger(start_floor, end_floor)
             self._passengers.add_passenger(p)
 
-    def make_passengers_from_schedule(self) -> None:
-        _, event = self.level.get_next_event(self._move_count)
-        print("EVENT: ", event)
+    def _make_passengers_from_schedule(self) -> None:
+        _, event = self._level.get_next_event(self._move_count)
         if event is not None: #TODO ungrossify
             for start_floor in event:
                 for end_floor in event[start_floor]:

@@ -5,6 +5,7 @@ class Level(object):
     NULL_EVENT = (-1, None)
 
     def __init__(self, filename: str=''):
+        #TODO separate parsing and state
         self._current_event = 0
         self._events = []
 
@@ -90,7 +91,7 @@ class Level(object):
         try:
             move = int(line[:separator])
         except ValueError:
-            raise IOError("Invalid format in {}, could not parse float from {}".format(filename, line[:separator]))
+            raise IOError("Invalid format in {}, could not parse int from {}".format(filename, line[:separator]))
 
         if move == self._event_get(-1)[0]:
             raise IOError("Invalid format in {}, move {} seen again on line {}".format(filename, move, line))
