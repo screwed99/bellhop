@@ -1,13 +1,13 @@
 import ast
 from typing import Optional, List, Dict
 
+
 class Level(object):
     NULL_EVENT = (-1, None)
 
-    def __init__(self, filename: str=''):
+    def __init__(self, filename: str='') -> None:
         self._current_event = 0
         self._events = []
-
         self._level_name = ''
         self._num_floors = 0
         self._capacity = 0

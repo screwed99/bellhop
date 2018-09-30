@@ -1,18 +1,21 @@
-from model.model import Bellhop
-from view.view_interface import ViewInterface
-from enums import State, Direction
 import pygame
 import sys
+from typing import Optional
+
+from enums import State, Direction
+from controller.interfaces import IController
+from model.interfaces import IBellhopController
+from view.interfaces import IView
 
 
-class GameController(object):
+class BellhopController(IController):
 
-    def __init__(self, game: Bellhop, view: ViewInterface):
-        self._game = game
-        self._view = view
+    def __init__(self, game: IBellhopController, view: IView) -> None:
+        self._game: IBellhopController = game
+        self._view: IView = view
 
     def _collect_input(self):
-        user_input = None
+        user_input: Optional[Direction] = None
         events = pygame.event.get()
         if len(events) == 0:
             return user_input
