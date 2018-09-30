@@ -1,23 +1,23 @@
-from typing import Dict
+from typing import Dict, List
 
 from model.passenger import Passenger
 
 
 class GaggleOfPassengers:
     def __init__(self):
-        self._passengers = []
+        self._passengers: List[Passenger] = []
 
     def add_passenger(self, passenger: Passenger) -> None:
         self._passengers.append(passenger)
 
-    def get_passengers_in_elevator(self) -> [Passenger]:
+    def get_passengers_in_elevator(self) -> List[Passenger]:
         return [passenger for passenger in self._passengers if passenger._in_elevator]
 
-    def get_passengers_waiting(self) -> [Passenger]:
+    def get_passengers_waiting(self) -> List[Passenger]:
         return [passenger for passenger in self._passengers if passenger.is_waiting_for_pickup()]
 
-    def get_passengers_waiting_by_floor(self) -> Dict[int, Passenger]:
-        waiting_by_floor = {}
+    def get_passengers_waiting_by_floor(self) -> Dict[int, List[Passenger]]:
+        waiting_by_floor: Dict[int, List[Passenger]] = {}
         for passenger in self.get_passengers_waiting():
             floor = passenger._floor_entered
             if floor not in waiting_by_floor:

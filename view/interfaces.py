@@ -1,7 +1,7 @@
 import abc
 
 
-class ViewInterface(abc.ABC):
+class IView(abc.ABC):
 
     @abc.abstractmethod
     def paint(self) -> None:

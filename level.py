@@ -1,8 +1,9 @@
 import ast
+from typing import Dict, List
 
 class Level():
-    def __init__(self, filename: str=''):
-        self._events = {}
+    def __init__(self, filename: str='') -> None:
+        self._events: Dict[int, List[int]] = {}
 
         self._level_name = ''
         self._num_floors = 0
