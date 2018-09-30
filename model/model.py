@@ -1,7 +1,7 @@
 import abc
 import random
 import time
-from typing import Optional
+from typing import Optional, Dict, List
 
 from enums import State, Direction
 from model.gaggle_of_passengers import GaggleOfPassengers
@@ -23,11 +23,11 @@ class BellhopModelInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    def get_elevator_contents(self) -> [Passenger]:
+    def get_elevator_contents(self) -> List[Passenger]:
         pass
 
     @abc.abstractmethod
-    def get_people_waiting(self) -> {int, Passenger}:
+    def get_people_waiting(self) -> Dict[int, List[Passenger]]:
         pass
 
     @abc.abstractmethod
@@ -38,11 +38,11 @@ class BellhopModelInterface(abc.ABC):
 
 class Bellhop(BellhopModelInterface):
 
-    def __init__(self, num_floors: int, capacity: int):
+    def __init__(self, num_floors: int, capacity: int) -> None:
         self._curr_state: State = State.WAIT_INPUT
         self._next_state: State = State.WAIT_INPUT
         self._state_leave: float = time.time() + float('inf')
-        self._user_input: Direction = None
+        self._user_input: Optional[Direction] = None
 
         # floors
         self._num_floors: int = num_floors
@@ -115,10 +115,10 @@ class Bellhop(BellhopModelInterface):
     def get_state(self) -> State:
         return self._curr_state
 
-    def get_elevator_contents(self) -> [Passenger]:
+    def get_elevator_contents(self) -> List[Passenger]:
         return self._passengers.get_passengers_in_elevator()
 
-    def get_people_waiting(self) -> {int, Passenger}:
+    def get_people_waiting(self) -> Dict[int, List[Passenger]]:
         return self._passengers.get_passengers_waiting_by_floor()
 
     def get_current_floor(self) -> int:

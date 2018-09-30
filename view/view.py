@@ -1,7 +1,8 @@
 import pygame
 
-from view.view_interface import ViewInterface
+from view.i_view import IView
 from model.model import BellhopModelInterface
+from typing import Dict, Tuple
 
 
 class PyGameImageWriter:
@@ -9,12 +10,12 @@ class PyGameImageWriter:
     def __init__(self, screen):
         self._screen = screen
 
-    def write(self, image, position: (int, int)) -> None:
+    def write(self, image, position: Tuple[int, int]) -> None:
         self._screen.blit(image, position)
 
 
-class BellhopView(ViewInterface):
-    def __init__(self, bellhop_model: BellhopModelInterface, model_vars: {str, int}, writer: PyGameImageWriter):
+class BellhopIView(IView):
+    def __init__(self, bellhop_model: BellhopModelInterface, model_vars: Dict[str, int], writer: PyGameImageWriter) -> None:
         self._bellhop_model = bellhop_model
         self._num_floors = model_vars['num_floors']
         self._capacity = model_vars['capacity']

@@ -1,14 +1,15 @@
 import time
+from controller.i_controller import IController
 from model.model import Bellhop
-from view.view_interface import ViewInterface
+from view.i_view import IView
 from enums import State, Direction
 
 
-class DebugGameController(object):
+class DebugGameController(IController):
 
-    def __init__(self, game: Bellhop, view: ViewInterface):
-        self._game = game
-        self._view = view
+    def __init__(self, game: Bellhop, view: IView) -> None:
+        self._game: Bellhop = game
+        self._view: IView = view
 
     def _collect_input(self):
         input_valid = False
