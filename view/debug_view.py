@@ -1,13 +1,13 @@
 import os
 
 from enums import State
-from model.model import BellhopModelInterface
+from model.interfaces import IBellhopView
 from view.i_view import IView
 
 
-class DebugIView(IView):
+class DebugView(IView):
 
-    def __init__(self, bellhop_model: BellhopModelInterface, clear: bool=False) -> None:
+    def __init__(self, bellhop_model: IBellhopView, clear: bool=False) -> None:
         self._bellhop_model = bellhop_model
         self._clear = clear
 

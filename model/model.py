@@ -1,10 +1,10 @@
-import abc
 import random
 import time
 from typing import Optional, Dict, List
 
 from enums import State, Direction
 from model.gaggle_of_passengers import GaggleOfPassengers
+from model.interfaces import IBellhopView, IBellhopController
 from model.passenger import Passenger
 
 random.seed(time.time())
@@ -16,27 +16,7 @@ STATE_TIME_MOVING_SECONDS = 2
 PASSENGER_PCT_CHANCE_PER_TICK = 0.1
 
 
-class BellhopModelInterface(abc.ABC):
-
-    @abc.abstractmethod
-    def get_state(self) -> State:
-        pass
-
-    @abc.abstractmethod
-    def get_elevator_contents(self) -> List[Passenger]:
-        pass
-
-    @abc.abstractmethod
-    def get_people_waiting(self) -> Dict[int, List[Passenger]]:
-        pass
-
-    @abc.abstractmethod
-    def get_current_floor(self) -> int:
-        pass
-
-
-
-class Bellhop(BellhopModelInterface):
+class BellhopModel(IBellhopView, IBellhopController):
 
     def __init__(self, num_floors: int, capacity: int) -> None:
         self._curr_state: State = State.WAIT_INPUT
@@ -48,10 +28,8 @@ class Bellhop(BellhopModelInterface):
         self._num_floors: int = num_floors
         self._curr_floor: int = 0
 
-
         # people
         self._passengers: GaggleOfPassengers = GaggleOfPassengers()
-        # todo enforce capacity
         self._capacity: int = capacity
 
 

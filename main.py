@@ -1,17 +1,17 @@
 import argparse
 import pygame
 
-from controller.controller import GameController
+from controller.controller import BellhopController
 from controller.debug_controller import DebugGameController
-from model.model import Bellhop
-from view.console_view import ConsoleIView, PyGameViewTextWriter
-from view.debug_view import DebugIView
-from view.view import BellhopIView, PyGameImageWriter
+from model.model import BellhopModel
+from view.console_view import ConsoleView, PyGameViewTextWriter
+from view.debug_view import DebugView
+from view.view import BellhopView, PyGameImageWriter
 from typing import Any
 
 
-def build_game_controller(width, height, num_floors=3, capacity=10) -> GameController:
-    model = Bellhop(num_floors, capacity)
+def build_game_controller(width, height, num_floors=3, capacity=10) -> BellhopController:
+    model = BellhopModel(num_floors, capacity)
     size = width, height
     pygame.init()
     screen = pygame.display.set_mode(size)
@@ -20,22 +20,22 @@ def build_game_controller(width, height, num_floors=3, capacity=10) -> GameContr
     pygame_font = pygame.font.SysFont('Courier New', font_size)
     writer = PyGameViewTextWriter(screen, pygame_font, font_size)
     model_vars = dict(num_floors=num_floors, capacity=capacity)
-    view = ConsoleIView(model, model_vars, writer)
-    return GameController(model, view)
+    view = ConsoleView(model, model_vars, writer)
+    return BellhopController(model, view)
 
-def build_visuals_controller(width, height, num_floors=3, capacity=5) -> GameController:
-    model = Bellhop(num_floors, capacity)
+def build_visuals_controller(width, height, num_floors=3, capacity=5) -> BellhopController:
+    model = BellhopModel(num_floors, capacity)
     size = width, height
     pygame.init()
     screen = pygame.display.set_mode(size)
     writer = PyGameImageWriter(screen)
     model_vars = dict(num_floors=num_floors, capacity=capacity)
-    view = BellhopIView(model, model_vars, writer)
-    return GameController(model, view)
+    view = BellhopView(model, model_vars, writer)
+    return BellhopController(model, view)
 
 def build_debug_game_controller(num_floors=3, capacity=10) -> DebugGameController:
-    model = Bellhop(num_floors, capacity)
-    view = DebugIView(model)
+    model = BellhopModel(num_floors, capacity)
+    view = DebugView(model)
     return DebugGameController(model, view)
 
 

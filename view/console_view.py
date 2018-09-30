@@ -1,5 +1,5 @@
 from assets.console_assets import Assets
-from model.model import BellhopModelInterface
+from model.interfaces import IBellhopView
 from view.i_view import IView
 from typing import Dict
 
@@ -24,10 +24,9 @@ class PyGameViewTextWriter:
             self._screen.blit(text_surface, (x, y + self._font_size * i))
 
 
-class ConsoleIView(IView):
+class ConsoleView(IView):
 
-
-    def __init__(self, bellhop_model: BellhopModelInterface, model_vars: Dict[str, int], writer: PyGameViewTextWriter) -> None:
+    def __init__(self, bellhop_model: IBellhopView, model_vars: Dict[str, int], writer: PyGameViewTextWriter) -> None:
         self._bellhop_model = bellhop_model
         self._num_floors = model_vars['num_floors']
         self._capacity = model_vars['capacity']

@@ -1,15 +1,15 @@
 from controller.i_controller import IController
-from model.model import Bellhop
+from model.interfaces import IBellhopController
 from view.i_view import IView
 from enums import State, Direction
 import pygame
 import sys
 
 
-class GameController(IController):
+class BellhopController(IController):
 
-    def __init__(self, game: Bellhop, view: IView) -> None:
-        self._game: Bellhop = game
+    def __init__(self, game: IBellhopController, view: IView) -> None:
+        self._game: IBellhopController = game
         self._view: IView = view
 
     def _collect_input(self):
