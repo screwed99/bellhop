@@ -5,7 +5,7 @@ from model.passenger import Passenger
 
 class GaggleOfPassengers:
     def __init__(self):
-        self._passengers = []
+        self._passengers: List[Passenger] = []
 
     def add_passenger(self, passenger: Passenger) -> None:
         self._passengers.append(passenger)

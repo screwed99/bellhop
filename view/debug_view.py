@@ -8,8 +8,8 @@ from view.interfaces import IView
 class DebugView(IView):
 
     def __init__(self, bellhop_model: IBellhopViewer, clear: bool=False) -> None:
-        self._bellhop_model = bellhop_model
-        self._clear = clear
+        self._bellhop_model: IBellhopViewer = bellhop_model
+        self._clear: bool = clear
 
     def paint(self) -> None:
         if self._clear:

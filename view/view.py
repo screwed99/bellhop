@@ -16,10 +16,10 @@ class PyGameImageWriter:
 
 class BellhopView(IView):
     def __init__(self, bellhop_model: IBellhopViewer, model_vars: Dict[str, int], writer: PyGameImageWriter) -> None:
-        self._bellhop_model = bellhop_model
-        self._num_floors = model_vars['num_floors']
-        self._capacity = model_vars['capacity']
-        self._writer = writer
+        self._bellhop_model: IBellhopViewer = bellhop_model
+        self._num_floors: int = model_vars['num_floors']
+        self._capacity: int = model_vars['capacity']
+        self._writer: PyGameImageWriter = writer
 
         # load assets
         self._door = pygame.image.load("assets/door.png")
