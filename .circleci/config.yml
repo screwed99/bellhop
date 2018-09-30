@@ -19,6 +19,12 @@ jobs:
             conda env create -f requirements.txt
 
       - run:
+          name: check types
+          command: |
+            source activate bellhop
+            sh run_type_checker.sh
+
+      - run:
           name: run tests
           command: |
             source activate bellhop
