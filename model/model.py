@@ -55,7 +55,7 @@ class Bellhop(BellhopModelInterface):
         self._capacity: int = capacity
 
 
-    def step(self, user_input: Optional[Direction]):
+    def step(self, user_input: Optional[Direction]) -> None:
         self._user_input = user_input
 
         self.make_random_passenger()
