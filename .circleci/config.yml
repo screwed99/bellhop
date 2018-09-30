@@ -22,12 +22,11 @@ jobs:
       - run:
           name: check types
           command: |
-            run_type_checker.sh
+            sh run_type_checker.sh
 
       - run:
           name: run tests
           command: |
-            source activate bellhop
             python -m unittest discover --pattern="*_tests.py"
 
       - store_artifacts:
