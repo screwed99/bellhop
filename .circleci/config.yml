@@ -22,7 +22,7 @@ jobs:
       - run:
           name: check types
           command: |
-	    run_type_checker.sh
+          run_type_checker.sh
 
       - run:
           name: run tests
