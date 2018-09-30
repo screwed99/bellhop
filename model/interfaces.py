@@ -5,7 +5,7 @@ from enums import State, Direction
 from model.passenger import Passenger
 
 
-class IBellhopView(abc.ABC):
+class IBellhopViewer(abc.ABC):
 
     @abc.abstractmethod
     def get_state(self) -> State:

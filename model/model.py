@@ -4,7 +4,7 @@ from typing import Optional, Dict, List
 
 from enums import State, Direction
 from model.gaggle_of_passengers import GaggleOfPassengers
-from model.interfaces import IBellhopView, IBellhopController
+from model.interfaces import IBellhopViewer, IBellhopController
 from model.passenger import Passenger
 
 random.seed(time.time())
@@ -16,7 +16,7 @@ STATE_TIME_MOVING_SECONDS = 2
 PASSENGER_PCT_CHANCE_PER_TICK = 0.1
 
 
-class BellhopModel(IBellhopView, IBellhopController):
+class BellhopModel(IBellhopViewer, IBellhopController):
 
     def __init__(self, num_floors: int, capacity: int) -> None:
         self._curr_state: State = State.WAIT_INPUT

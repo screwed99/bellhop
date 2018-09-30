@@ -1,7 +1,7 @@
 import time
-from controller.i_controller import IController
+from controller.interfaces import IController
 from model.interfaces import IBellhopController
-from view.i_view import IView
+from view.interfaces import IView
 from enums import State, Direction
 
 
