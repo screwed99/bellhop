@@ -21,5 +21,6 @@ end_level
         mock_level_file_open.return_value.__next__ = lambda self: next(iter(self.readline, ''))
 
         filename = "filename.txt"
-        # mock_level_file_open.assert_called_once_with(filename, 'r') # I don't understand this but it's failing when I'm faily sure it shouldn't be
+        # mock_level_file_open.assert_called_once_with(filename, 'r')
+        # ^ I don't understand this but it's failing when I'm fairly sure it shouldn't be
         self.assertRaises(IOError, Level, filename=filename)
