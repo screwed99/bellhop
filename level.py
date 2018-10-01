@@ -1,5 +1,5 @@
 import ast
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, SupportsInt
 
 
 class Level(object):
@@ -12,12 +12,13 @@ class Level(object):
 
     def __init__(self, filename: str='') -> None:
         #TODO separate parsing and state
-        self._current_event = 0
+        self._current_event: int = 0
         self._events: Dict = {}
-        self._level_name = ''
-        self._num_floors = 0
-        self._capacity = 0
-        self._level_finish_move_number = 0
+        self._level_name: str = ''
+        self._num_floors: int = 0
+        self._capacity: int = 0
+        self._level_finish_move_number: int = 0
+        self._parser_last_move_seen: int = -1
 
         if filename != '':
             self.parse_from_file(filename)
@@ -80,6 +81,11 @@ class Level(object):
         except ValueError:
             raise IOError("Invalid format in {}, could not parse int from {}".format(filename, line[:separator]))
 
+        if move <= self._parser_last_move_seen:
+            raise IOError("Invalid format in {}, out of order move {} seen on line {}".format(filename, move, line))
+        else:
+            self._parser_last_move_seen = move
+
         if move in self._events:
             raise IOError("Invalid format in {}, move {} seen again on line {}".format(filename, move, line))
 
@@ -87,5 +93,4 @@ class Level(object):
             self._events[move] = ast.literal_eval(line[separator + 1:])
         except:
             raise IOError("Invalid format in {}, could not parse dict from {}".format(filename, line[separator + 1:]))
-
 
