@@ -45,9 +45,11 @@ class ConsoleView(IView):
     def print_game(self) -> None:
         floors = [self.get_floor_with_people(floor_num) for floor_num in (range(self._num_floors))]
         elevator = self.get_elevator_with_people()
+        stats = self.get_stats()
         elevator_at_floor = self._bellhop_model.get_current_floor()
         floors[elevator_at_floor] = self._concat_by_line([floors[elevator_at_floor], elevator])
         #TODO instead merge floors into one str, then place elevator at correct level so feet are level
+        floors.append(stats)
         game_text = '\n'.join(reversed(floors))
         self._writer.write(game_text)
 
@@ -78,6 +80,9 @@ class ConsoleView(IView):
         merged_people = self._merge_passengers(people)
         elevator_with_people = self._put_people_in_elevator(merged_people)
         return elevator_with_people
+
+    def get_stats(self) -> str:
+        return "<< Move: {}>>".format(self._bellhop_model.get_move_number())
 
     def _render_passenger(self, id: int) -> str:
         s = Assets.PERSON
