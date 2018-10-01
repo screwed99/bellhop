@@ -11,7 +11,7 @@ from view.debug_view import DebugView
 from view.view import BellhopView, PyGameImageWriter
 
 
-def build_game_controller(width, height, level_path='levels/example.txt') -> BellhopController:
+def build_game_controller(width: int, height: int, level_path: str) -> BellhopController:
     level = Level(level_path)
     model = BellhopModel(level)
     size = width, height
@@ -25,7 +25,7 @@ def build_game_controller(width, height, level_path='levels/example.txt') -> Bel
     view = ConsoleView(model, model_vars, writer)
     return BellhopController(model, view)
 
-def build_visuals_controller(width, height, level_path) -> BellhopController:
+def build_visuals_controller(width: int, height: int, level_path: str) -> BellhopController:
     level = Level(level_path)
     model = BellhopModel(level)
     size = width, height
@@ -36,7 +36,7 @@ def build_visuals_controller(width, height, level_path) -> BellhopController:
     view = BellhopView(model, model_vars, writer)
     return BellhopController(model, view)
 
-def build_debug_game_controller(level_path) -> DebugGameController:
+def build_debug_game_controller(level_path: str) -> DebugGameController:
     level = Level(level_path)
     model = BellhopModel(level)
     view = DebugView(model)
