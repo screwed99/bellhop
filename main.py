@@ -4,7 +4,7 @@ from typing import Any
 
 from controller.controller import BellhopController
 from controller.debug_controller import DebugGameController
-from level import Level
+from levels.level import Level
 from model.model import BellhopModel
 from view.console_view import ConsoleView, PyGameViewTextWriter
 from view.debug_view import DebugView

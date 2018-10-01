@@ -3,7 +3,7 @@ import time
 from typing import Optional, Dict, List
 
 from enums import State, Direction
-from level import Level
+from levels.level import Level
 from model.gaggle_of_passengers import GaggleOfPassengers
 from model.interfaces import IBellhopViewer, IBellhopController
 from model.passenger import Passenger
@@ -93,8 +93,7 @@ class BellhopModel(IBellhopViewer, IBellhopController):
                 self._goto_next_state()
 
         elif self._curr_state == State.LEVEL_COMPLETE:
-            # TODO exit level somehow
-            pass #you can checkout -feature/end_level BUT YOU CAN'T NEVER LEAVE (guitar solo)
+            exit(-1)
         
         else:
             raise NotImplementedError

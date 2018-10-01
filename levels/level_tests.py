@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, mock_open
 
-from level import Level
+from levels.level import Level
 
 class LevelTests(unittest.TestCase):
 
@@ -21,6 +21,7 @@ end_level
         mock_level_file_open.return_value.__next__ = lambda self: next(iter(self.readline, ''))
 
         filename = "filename.txt"
-        # mock_level_file_open.assert_called_once_with(filename, 'r')
-        # ^ I don't understand this but it's failing when I'm fairly sure it shouldn't be
+
         self.assertRaises(IOError, Level, filename=filename)
+
+        mock_level_file_open.assert_called_once_with(filename, 'r')
