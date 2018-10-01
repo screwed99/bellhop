@@ -1,29 +1,51 @@
 import ast
-from typing import Dict, List
+from typing import Optional, List, Dict, SupportsInt
 
-class Level():
+
+class Level(object):
+    """
+    move: an int that describes the move number since level start
+    event: a dict that describes the passenger generation for a given move, or None
+    """
+
+    NULL_EVENT = None  # is making this an explicit variable even neccessary
+
     def __init__(self, filename: str='') -> None:
-        self._events: Dict[int, List[int]] = {}
-
-        self._level_name = ''
-        self._num_floors = 0
-        self._total_time_sec = 0.
+        #TODO separate parsing and state
+        self._current_event: int = 0
+        self._events: Dict = {}
+        self._level_name: str = ''
+        self._num_floors: int = 0
+        self._capacity: int = 0
+        self._level_finish_move_number: int = 0
+        self._parser_last_move_seen: int = -1
 
         if filename != '':
             self.parse_from_file(filename)
 
-    # todo implement interface for getting
+    def get_num_floors(self) -> int:
+        return self._num_floors
 
-    # get_pending_event(time: float) -> Dict[int, List[int]]
+    def get_capacity(self) -> int:
+        return self._capacity
 
-    # get_total_time() -> float
+    def get_event(self, move: int) -> Optional[Dict[int, List[int]]]:
+        return self._events.get(move, self.NULL_EVENT)
 
-    # get_level_name() -> str
+    def get_level_finish_move_number(self) -> int:
+        return self._level_finish_move_number
+
+    def get_level_name(self) -> str:
+        return self._level_name
 
     def __str__(self):
-        return "Level: {} Floors: {} Time(sec): {}\n" \
+        return "Level: {} Floors: {} Move #: {}\n" \
                "--Events--:\n{}" \
-               "".format(self._level_name, self._num_floors, self._total_time_sec, self._events)
+               "".format(self._level_name,
+                         self._num_floors,
+                         self._capacity,
+                         self._level_finish_move_number,
+                         self._events)
 
     # todo more features
     def parse_from_file(self, filename: str):
@@ -31,7 +53,7 @@ class Level():
         with open(filename, 'r') as f:
             for line in f:
                 line = line.rstrip()
-                if not line or line.startswith('##'):
+                if not line or line.startswith('#'):
                     continue
 
                 if line.startswith('level'):
@@ -39,7 +61,8 @@ class Level():
                     level_split = line.split(' ')
                     self._level_name = str(level_split[1])
                     self._num_floors = int(level_split[2])
-                    self._total_time_sec = float(level_split[3])
+                    self._capacity = int(level_split[3])
+                    self._level_finish_move_number = int(level_split[4])
                 elif line.startswith('end_level'):
                     break
                 else:
@@ -54,16 +77,20 @@ class Level():
             raise IOError("Invalid format in {}, could not find separator(:) on line {}".format(filename, line))
 
         try:
-            time = float(line[:separator])
+            move = int(line[:separator])
         except ValueError:
-            raise IOError("Invalid format in {}, could not parse float from {}".format(filename, line[:separator]))
+            raise IOError("Invalid format in {}, could not parse int from {}".format(filename, line[:separator]))
 
-        if time in self._events.keys():
-            raise IOError("Invalid format in {}, timestamp {} seen again on line {}".format(filename, time, line))
+        if move <= self._parser_last_move_seen:
+            raise IOError("Invalid format in {}, out of order move {} seen on line {}".format(filename, move, line))
+        else:
+            self._parser_last_move_seen = move
+
+        if move in self._events:
+            raise IOError("Invalid format in {}, move {} seen again on line {}".format(filename, move, line))
+
         try:
-            self._events[time] = ast.literal_eval(line[separator + 1:])
-
+            self._events[move] = ast.literal_eval(line[separator + 1:])
         except:
             raise IOError("Invalid format in {}, could not parse dict from {}".format(filename, line[separator + 1:]))
-
 

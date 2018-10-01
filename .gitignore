@@ -1,5 +1,5 @@
-.idea/
-.mypy_cache/
+*.idea/
+*.pyc
 .ipynb_checkpoints/
 *.ipynb
-*.pyc
+*.mypy_cache/
