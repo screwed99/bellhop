@@ -1,8 +1,10 @@
-from typing import Dict, List
+import random
+from typing import Dict, List, Optional
 
 from assets.console_assets import Assets
 from model.interfaces import IBellhopViewer
 from view.interfaces import IView
+from enums import State
 
 
 class PyGameViewTextWriter:
@@ -32,9 +34,13 @@ class ConsoleView(IView):
         self._num_floors: int = model_vars['num_floors']
         self._capacity: int = model_vars['capacity']
         self._writer: PyGameViewTextWriter = writer
+        self._tips: Optional[int] = None
 
     def paint(self) -> None:
-        self.print_game()
+        if self._bellhop_model.get_state() == State.LEVEL_COMPLETE:
+            self.print_level_complete()
+        else:
+            self.print_game()
 
     def print_game(self) -> None:
         floors = [self.get_floor_with_people(floor_num) for floor_num in (range(self._num_floors))]
@@ -45,6 +51,13 @@ class ConsoleView(IView):
         game_text = '\n'.join(reversed(floors))
         self._writer.write(game_text)
 
+    def print_level_complete(self):
+        moves = self._bellhop_model.get_move_number()
+        if self._tips is None:
+            self._tips = round(random.random()*1e3, 2)
+        game_text = ("Well done Bellhop guy! You finished the level in {} moves and made ${} in tips!"
+                     .format(moves, self._tips))
+        self._writer.write(game_text)
 
     def get_floor_with_people(self, floor_num: int) -> str:
         passengers = self._bellhop_model.get_people_waiting().get(floor_num, [])

@@ -47,6 +47,9 @@ class BellhopModel(IBellhopViewer, IBellhopController):
     def get_current_floor(self) -> int:
         return self._curr_floor
 
+    def get_move_number(self) -> int:
+        return self._move_count
+
     def step(self, user_input: Optional[Direction]) -> None:
         self._user_input = user_input
 
@@ -57,8 +60,11 @@ class BellhopModel(IBellhopViewer, IBellhopController):
                 self._goto_next_state()
 
         elif self._curr_state == State.PEOPLE_OFF:
-            self._setup_next_state(State.PEOPLE_ON, STATE_TIME_PEOPLE_OFF_SECONDS)
             self._passengers.drop_off(self.get_current_floor())
+            if self._is_level_finished():
+                self._setup_next_state(State.LEVEL_COMPLETE, STATE_TIME_PEOPLE_OFF_SECONDS)
+            else:
+                self._setup_next_state(State.PEOPLE_ON, STATE_TIME_PEOPLE_OFF_SECONDS)
             if self._state_timeout():
                 self._goto_next_state()
 
@@ -85,6 +91,11 @@ class BellhopModel(IBellhopViewer, IBellhopController):
             self._setup_next_state(State.ARRIVING, STATE_TIME_MOVING_SECONDS)
             if self._state_timeout():
                 self._goto_next_state()
+
+        elif self._curr_state == State.LEVEL_COMPLETE:
+            # TODO exit level somehow
+            pass #you can checkout -feature/end_level BUT YOU CAN'T NEVER LEAVE (guitar solo)
+        
         else:
             raise NotImplementedError
 
@@ -133,8 +144,7 @@ class BellhopModel(IBellhopViewer, IBellhopController):
     def _state_timeout(self) -> bool:
         return self._curr_state != self._next_state and self._state_leave > time.time()
 
-    def _is_game_finished(self) -> bool:
-        # TODO use this in controller
+    def _is_level_finished(self) -> bool:
         is_level_schedule_complete = self._level.get_level_finish_move_number() <= self._move_count
         are_lobbies_empty = len(self._passengers.get_passengers_waiting_by_floor()) == 0
         is_elevator_empty = len(self.get_elevator_contents()) == 0

@@ -23,6 +23,9 @@ class IBellhopViewer(abc.ABC):
     def get_current_floor(self) -> int:
         pass
 
+    @abc.abstractmethod
+    def get_move_number(self) -> int:
+        pass
 
 class IBellhopController(abc.ABC):
 

@@ -10,3 +10,4 @@ class State(Enum):
     PEOPLE_ON = 2
     WAIT_INPUT = 3
     MOVING = 4
+    LEVEL_COMPLETE = 5
