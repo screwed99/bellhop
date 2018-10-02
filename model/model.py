@@ -3,7 +3,7 @@ import time
 from typing import Optional, Dict, List
 
 from enums import State, Direction
-from level import Level
+from levels.level import Level
 from model.gaggle_of_passengers import GaggleOfPassengers
 from model.interfaces import IBellhopViewer, IBellhopController
 from model.passenger import Passenger

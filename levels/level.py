@@ -3,12 +3,6 @@ from typing import Optional, List, Dict, SupportsInt
 
 
 class Level(object):
-    """
-    move: an int that describes the move number since level start
-    event: a dict that describes the passenger generation for a given move, or None
-    """
-
-    NULL_EVENT = None  # is making this an explicit variable even neccessary
 
     def __init__(self, filename: str='') -> None:
         #TODO separate parsing and state
@@ -30,7 +24,7 @@ class Level(object):
         return self._capacity
 
     def get_event(self, move: int) -> Optional[Dict[int, List[int]]]:
-        return self._events.get(move, self.NULL_EVENT)
+        return self._events.get(move)
 
     def get_level_finish_move_number(self) -> int:
         return self._level_finish_move_number
@@ -83,11 +77,8 @@ class Level(object):
 
         if move <= self._parser_last_move_seen:
             raise IOError("Invalid format in {}, out of order move {} seen on line {}".format(filename, move, line))
-        else:
-            self._parser_last_move_seen = move
 
-        if move in self._events:
-            raise IOError("Invalid format in {}, move {} seen again on line {}".format(filename, move, line))
+        self._parser_last_move_seen = move
 
         try:
             self._events[move] = ast.literal_eval(line[separator + 1:])
