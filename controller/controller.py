@@ -2,7 +2,7 @@ import pygame
 import sys
 from typing import Optional
 
-from enums import State, Direction
+from enums import Direction
 from controller.interfaces import IController
 from model.interfaces import IBellhopController
 from view.interfaces import IView
@@ -26,6 +26,9 @@ class BellhopController(IController):
                 user_input = Direction.UP
             elif event.key == pygame.K_d:
                 user_input = Direction.DOWN
+            elif event.key == pygame.K_q:
+                pygame.quit()
+                sys.exit()
         elif event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
@@ -33,13 +36,8 @@ class BellhopController(IController):
 
     def run(self, clock):
         while True:
-            curr_state = self._game.get_state()
-            if curr_state == State.WAIT_INPUT:
-                user_input = self._collect_input()
-                self._game.step(user_input)
-            else:
-                self._game.step(None)
-
+            user_input = self._collect_input()
+            self._game.step(user_input)
             self._view.paint()
             pygame.display.flip()
 

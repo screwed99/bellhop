@@ -32,7 +32,3 @@ class IBellhopController(abc.ABC):
     @abc.abstractmethod
     def step(self, user_input: Optional[Direction]) -> None:
         pass
-
-    @abc.abstractmethod
-    def get_state(self) -> State:
-        pass

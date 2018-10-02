@@ -93,7 +93,8 @@ class BellhopModel(IBellhopViewer, IBellhopController):
                 self._goto_next_state()
 
         elif self._curr_state == State.LEVEL_COMPLETE:
-            exit(-1)
+            # TODO exit level somehow
+            pass #you can checkout -feature/end_level BUT YOU CAN'T NEVER LEAVE (guitar solo)
         
         else:
             raise NotImplementedError
