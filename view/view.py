@@ -14,19 +14,28 @@ class PyGameImage:
         self._rect.move_ip(x_off, y_off)
 
     def get_width(self) -> int:
-        return self._image.get_width()
+        ret = self._image.get_width()
+        if ret == None:
+            return 0
+        return int(ret)
 
     def get_height(self) -> int:
-        return self._image.get_height()
+        ret = self._image.get_height()
+        if ret == None:
+            return 0
+        return int(ret)
 
     def get_position(self) -> Tuple[int, int]:
-        return self._rect.topleft
+        ret = self._rect.topleft
+        if ret == None:
+            return (0, 0)
+        return (ret[0], ret[1])
 
     def get_x(self) -> int:
-        return self._rect.x
+        return self.get_position()[0]
 
     def get_y(self) -> int:
-        return self._rect.y
+        return self.get_position()[1]
 
     def get_surface(self) -> pygame.Surface:
         return self._image
