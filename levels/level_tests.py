@@ -3,6 +3,7 @@ from unittest.mock import patch, mock_open
 
 from levels.level import Level
 
+
 class LevelTests(unittest.TestCase):
 
     _text_moves_out_of_order = """
