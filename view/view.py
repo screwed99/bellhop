@@ -15,19 +15,19 @@ class PyGameImage:
 
     def get_width(self) -> int:
         ret = self._image.get_width()
-        if ret == None:
+        if ret is None:
             return 0
         return int(ret)
 
     def get_height(self) -> int:
         ret = self._image.get_height()
-        if ret == None:
+        if ret is None:
             return 0
         return int(ret)
 
     def get_position(self) -> Tuple[int, int]:
         ret = self._rect.topleft
-        if ret == None:
+        if ret is None:
             return (0, 0)
         return (ret[0], ret[1])
 
