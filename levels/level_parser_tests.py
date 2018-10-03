@@ -1,9 +1,10 @@
 import unittest
 from unittest.mock import patch, mock_open
 
-from levels.level import Level
+from levels.level_parser import LevelParser
 
-class LevelTests(unittest.TestCase):
+
+class LevelParserTests(unittest.TestCase):
 
     _text_moves_out_of_order = """
 level 1 5 5 3
@@ -21,7 +22,8 @@ end_level
         mock_level_file_open.return_value.__next__ = lambda self: next(iter(self.readline, ''))
 
         filename = "filename.txt"
+        level_parser = LevelParser(filename)
 
-        self.assertRaises(IOError, Level, filename=filename)
+        self.assertRaises(IOError, level_parser.parse_from_file)
 
         mock_level_file_open.assert_called_once_with(filename, 'r')

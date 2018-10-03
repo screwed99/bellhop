@@ -3,3 +3,4 @@
 .ipynb_checkpoints/
 *.ipynb
 *.mypy_cache/
+*.DS_Store

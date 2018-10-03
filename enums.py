@@ -1,8 +1,10 @@
 from enum import Enum
 
+
 class Direction(Enum):
     UP = 0
     DOWN = 1
+
 
 class State(Enum):
     ARRIVING = 0

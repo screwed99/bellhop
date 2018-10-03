@@ -5,14 +5,21 @@ from typing import Any
 from controller.controller import BellhopController
 from controller.debug_controller import DebugGameController
 from levels.level import Level
+from levels.level_parser import LevelParser
 from model.model import BellhopModel
 from view.console_view import ConsoleView, PyGameViewTextWriter
 from view.debug_view import DebugView
 from view.view import BellhopView, PyGameImageWriter
 
 
+def get_parsed_level(level_path: str):
+    parser = LevelParser(level_path)
+    level = parser.parse_from_file()
+    return level
+
+
 def build_game_controller(width: int, height: int, level_path: str) -> BellhopController:
-    level = Level(level_path)
+    level = get_parsed_level(level_path)
     model = BellhopModel(level)
     size = width, height
     pygame.init()
@@ -25,8 +32,9 @@ def build_game_controller(width: int, height: int, level_path: str) -> BellhopCo
     view = ConsoleView(model, model_vars, writer)
     return BellhopController(model, view)
 
+
 def build_visuals_controller(width: int, height: int, level_path: str) -> BellhopController:
-    level = Level(level_path)
+    level = get_parsed_level(level_path)
     model = BellhopModel(level)
     size = width, height
     pygame.init()
@@ -36,8 +44,9 @@ def build_visuals_controller(width: int, height: int, level_path: str) -> Bellho
     view = BellhopView(model, model_vars, writer)
     return BellhopController(model, view)
 
+
 def build_debug_game_controller(level_path: str) -> DebugGameController:
-    level = Level(level_path)
+    level = get_parsed_level(level_path)
     model = BellhopModel(level)
     view = DebugView(model)
     return DebugGameController(model, view)
