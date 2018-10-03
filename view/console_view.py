@@ -11,8 +11,8 @@ from enums import State
 class PyGameViewTextWriter:
 
     def __init__(self, screen: pygame.Surface, pygame_font: pygame.font.Font, font_size: int) -> None:
-        self._screen = screen
-        self._pygame_font = pygame_font
+        self._screen: pygame.Surface = screen
+        self._pygame_font: pygame.font.Font = pygame_font
         self._font_size: int = font_size
 
     def write(self, game_text: str) -> None:

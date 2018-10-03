@@ -47,7 +47,7 @@ class PyGameImage:
 class PyGameImageWriter:
 
     def __init__(self, screen: pygame.Surface) -> None:
-        self._screen: pygame.SurfaceType = screen
+        self._screen: pygame.Surface = screen
 
     def write(self, image: PyGameImage) -> None:
         self._screen.blit(image.get_surface(), image.get_position())
@@ -62,7 +62,6 @@ class BellhopView(IView):
 
         # load assets
         self._left_door: PyGameImage = PyGameImage(pygame.image.load("assets/door.png").convert_alpha())
-
         self._right_door: PyGameImage = PyGameImage(self._left_door.get_surface_copy())
         self._right_door.move(self._left_door.get_x() + self._left_door.get_width(), 0)
 
