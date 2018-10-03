@@ -1,4 +1,5 @@
 import random
+import pygame
 from typing import Dict, List, Optional
 
 from assets.console_assets import Assets
@@ -9,7 +10,7 @@ from enums import State
 
 class PyGameViewTextWriter:
 
-    def __init__(self, screen, pygame_font, font_size: int) -> None:
+    def __init__(self, screen: pygame.Surface, pygame_font: pygame.font.Font, font_size: int) -> None:
         self._screen = screen
         self._pygame_font = pygame_font
         self._font_size: int = font_size
