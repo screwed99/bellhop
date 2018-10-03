@@ -12,7 +12,7 @@ from view.debug_view import DebugView
 from view.view import BellhopView, PyGameImageWriter
 
 
-def get_parsed_level(level_path):
+def get_parsed_level(level_path: str):
     parser = LevelParser(level_path)
     level = parser.parse_from_file()
     return level

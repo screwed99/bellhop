@@ -3,8 +3,13 @@ from typing import Optional, List, Dict
 
 class Level(object):
 
-    def __init__(self, events, level, num_floors, capacity, length_in_moves) -> None:
-        self._events: Dict = events
+    def __init__(self,
+                 events: Dict[int, Dict[int, List[int]]],
+                 level: str,
+                 num_floors: int,
+                 capacity: int,
+                 length_in_moves: int) -> None:
+        self._events: Dict[int, Dict[int, List[int]]] = events
         self._level_name: str = level
         self._num_floors: int = num_floors
         self._capacity: int = capacity

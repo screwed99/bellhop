@@ -8,9 +8,8 @@ class LevelParser(object):
         self._filename: str = filename
         self._parser_last_move_seen: int = -1
 
-    # TODO Add more features
+
     def parse_from_file(self) -> Level:
-        # TODO Add return type to this function
         level_line_seen: bool = False
         events: dict = {}
         level_name: str = ''
