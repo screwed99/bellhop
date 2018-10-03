@@ -1,3 +1,5 @@
-#/bin/bash
+#!/bin/bash
+set -e
 source activate bellhop
-python main.py
+./run_type_checker.sh
+python main.py "$@"

@@ -4,14 +4,53 @@ from view.interfaces import IView
 from model.interfaces import IBellhopViewer
 from typing import Dict, Tuple
 
+class PyGameImage:
+
+    def __init__(self, image: pygame.Surface) -> None:
+        self._image: pygame.Surface = image
+        self._rect: pygame.Rect = self._image.get_rect()
+
+    def move(self, x_off: int, y_off: int) -> None:
+        self._rect.move_ip(x_off, y_off)
+
+    def get_width(self) -> int:
+        ret = self._image.get_width()
+        if ret is None:
+            return 0
+        return int(ret)
+
+    def get_height(self) -> int:
+        ret = self._image.get_height()
+        if ret is None:
+            return 0
+        return int(ret)
+
+    def get_position(self) -> Tuple[int, int]:
+        ret = self._rect.topleft
+        if ret is None:
+            return (0, 0)
+        return (ret[0], ret[1])
+
+    def get_x(self) -> int:
+        return self.get_position()[0]
+
+    def get_y(self) -> int:
+        return self.get_position()[1]
+
+    def get_surface(self) -> pygame.Surface:
+        return self._image
+
+    def get_surface_copy(self) -> pygame.Surface:
+        return self._image.copy()
+
 
 class PyGameImageWriter:
 
-    def __init__(self, screen):
-        self._screen = screen
+    def __init__(self, screen: pygame.Surface) -> None:
+        self._screen: pygame.Surface = screen
 
-    def write(self, image, position: Tuple[int, int]) -> None:
-        self._screen.blit(image, position)
+    def write(self, image: PyGameImage) -> None:
+        self._screen.blit(image.get_surface(), image.get_position())
 
 
 class BellhopView(IView):
@@ -22,14 +61,23 @@ class BellhopView(IView):
         self._writer: PyGameImageWriter = writer
 
         # load assets
-        self._door = pygame.image.load("assets/door.png")
-        self._console = pygame.image.load("assets/console.png")
-        self._indicator_sheet = pygame.image.load("assets/indicator.png")
+        self._left_door: PyGameImage = PyGameImage(pygame.image.load("assets/door.png").convert_alpha())
+        self._right_door: PyGameImage = PyGameImage(self._left_door.get_surface_copy())
+        self._right_door.move(self._left_door.get_x() + self._left_door.get_width(), 0)
 
-    def paint(self):
+        self._elevator: PyGameImage = PyGameImage(pygame.image.load("assets/elevator.png").convert_alpha())
+        self._elevator.move(self._right_door.get_x() + self._right_door.get_width(), 0)
+
+        self._console: PyGameImage = PyGameImage(pygame.image.load("assets/console.png").convert_alpha())
+        self._console.move(self._elevator.get_x() + self._elevator.get_width(), 0)
+        # # todo figure out how the pygame sprite classes work
+        # self._indicator_sheet: pygame.Surface = pygame.image.load("assets/indicator.png").convert_alpha()
+
+    def paint(self) -> None:
         self.print_game()
 
-    def print_game(self):
-        self._writer.write(self._door, (100, 200))
-        self._writer.write(self._console, (400, 100))
-        self._writer.write(self._indicator_sheet, (410, 250))
+    def print_game(self) -> None:
+        self._writer.write(self._left_door)
+        self._writer.write(self._right_door)
+        self._writer.write(self._elevator)
+        self._writer.write(self._console)
